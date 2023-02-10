@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Route, Routes } from "react-router-dom"
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import AllProducts from './AllProducts';
@@ -19,8 +20,8 @@ export default function Dashboard() {
   return (
     <ThemeProvider theme={darkTheme}>
         <Container maxWidth="xl">
-            <AllProducts />
-            {/* <SingleProduct /> */}
+            {/* <AllProducts /> */}
+            <SingleProduct />
             {/* <Cart /> */}
             {/* <Checkout /> */}
         </Container>

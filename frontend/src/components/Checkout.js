@@ -14,10 +14,10 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 
-interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
+const TabPanelProps = {
+    children,
+    index,
+    value,
   }
   
   function TabPanel(props: TabPanelProps) {
@@ -40,7 +40,7 @@ interface TabPanelProps {
     );
   }
   
-  function a11yProps(index: number) {
+  function a11yProps(index) {
     return {
       id: `simple-tab-${index}`,
       'aria-controls': `simple-tabpanel-${index}`,
@@ -50,14 +50,14 @@ interface TabPanelProps {
 const Checkout = () => {
     const [value, setValue] = React.useState(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (event, newValue) => {
     setValue(newValue);
   };
   return (
     <div>
-        <Box sx={{ width: '100%' }} sx={{ m: 2 }}>
+        <Box sx={{ width: '100%', m: 2 }}>
             <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 2 }} justifyContent="center">
-                <Grid item xs={12} md={8} style={{ marginTop: "30px", backgroundColor: "#121212"}}>
+                <Grid item xs={12} md={8} style={{ marginTop: "30px"}} className="box-shadow">
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                             <Tab label="Contact Info" {...a11yProps(0)} />

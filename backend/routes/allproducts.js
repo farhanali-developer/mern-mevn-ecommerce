@@ -12,7 +12,6 @@ router.get('/', paginate(AllProducts), async (req, res) => {
 })
 
 
-
 router.post('/login', async (req, res) => {
   const user = await Users.findOne({email: req.body.email})
 
@@ -114,9 +113,9 @@ router.post('/csv_products', async (req, res) => {
 });
 
 // Getter by id
-router.get('/get/:id', async (req, res) => {
-  const t = await AllProducts.findById({ _id : req.params.id })
-  res.json(t)
+router.get('/product/:id', async (req, res) => {
+  const data = await AllProducts.findById({ _id : req.params.id })
+  res.json(data)
 })
 
 // Delete a Product by id

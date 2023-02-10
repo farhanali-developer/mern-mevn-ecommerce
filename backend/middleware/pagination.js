@@ -28,7 +28,7 @@ function paginate(model) {
             // .limit(limit).skip(startIndex) replaced the slice method because 
             // it is done directly from mongodb and they are one of mongodb methods
             const allProducts = await model.find({});
-            result.results = await model.find().sort({"createdAt": "desc"}).limit(limit).skip(startIndex);
+            result.results = await model.find().limit(limit).skip(startIndex).sort({"createdAt": "desc"});
             result.totalProducts = allProducts.length
             res.paginatedResult = result;
             next();
