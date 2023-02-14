@@ -1,4 +1,8 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -10,10 +14,12 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { Link } from 'react-router-dom';
-
 import { common } from '@mui/material/colors';
-import { Typography } from '@mui/material';
+import Container from '@mui/material/Container';
+
+import { Context } from '../context';
+
+
 
 const whiteColor = common.white;
 
@@ -34,6 +40,16 @@ function createData(
   ];
 
 const Cart = () => {
+
+    const { state, dispatch } = useContext(Context);
+    const { cart } = state;
+    let total = 0;
+
+    for(const [key, value] of Object.entries(cart)) {
+        total = total + cart[key].price * cart[key].qty;
+    }
+
+
   return (
     <div>
         <Box sx={{ width: '100%', m: 2 }}>
@@ -53,16 +69,16 @@ const Cart = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                            {rows.map((row) => (
+                            {Object.entries(cart).map(([key, value]) => (
                                 <TableRow
-                                key={row.name}
+                                key={cart[key]?.title}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                 <TableCell component="th" scope="row">
-                                    <img src={`${row.productImage}`} style={{ height: "50px", width: "50px", objectFit: "cover" }} alt="" />
+                                    <img src={`${cart[key]?.thumbnail}`} style={{ height: "50px", width: "50px", objectFit: "cover" }} alt="" />
                                 </TableCell>
-                                <TableCell align="center">{row.title}</TableCell>
-                                <TableCell align="center">{row.price}</TableCell>
+                                <TableCell align="center">{cart[key]?.title}</TableCell>
+                                <TableCell align="center">{cart[key]?.price}</TableCell>
                                 <TableCell align="center">
                                     <TextField
                                         id="standard-number"

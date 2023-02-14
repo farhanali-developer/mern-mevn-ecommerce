@@ -17,6 +17,9 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import { Context } from '../context';
 
 const darkTheme = createTheme({
     palette: {
@@ -73,6 +76,16 @@ export default function Navbar() {
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
+  const { state } = useContext(Context)
+  const { cart } = state
+  let itemCount = 0
+
+  for(const [key, value] of Object.entries(cart)) {
+    itemCount = itemCount + cart[key].qty
+  }
+
+  console.log(itemCount)
+
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -89,6 +102,10 @@ export default function Navbar() {
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
+
+  const logout = () => {
+    localStorage.removeItem("jwt")
+  }
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -107,8 +124,13 @@ export default function Navbar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <Link to="/login">
+        <MenuItem onClick={handleMenuClose}>Login</MenuItem>
+      </Link>
+      <Link to="/signup">
+        <MenuItem onClick={handleMenuClose}>Register</MenuItem>
+      </Link>
+      <MenuItem onClick={logout}>Logout</MenuItem>
     </Menu>
   );
 
@@ -197,16 +219,19 @@ export default function Navbar() {
             </Search>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                <Badge badgeContent={4} color="error">
-                    <MailIcon />
-                </Badge>
-                </IconButton>
+                <Link to="/cart" style={{ textDecoration: "none", color: "unset" }}>
+                  <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                    <Badge badgeContent={itemCount} color="error">
+                        <ShoppingCartIcon />
+                    </Badge>
+                  </IconButton>
+                 
+                </Link>
                 <IconButton
-                size="large"
-                aria-label="show 17 new notifications"
-                color="inherit"
-                >
+                  size="large"
+                  aria-label="show 17 new notifications"
+                  color="inherit"
+                  >
                 <Badge badgeContent={17} color="error">
                     <NotificationsIcon />
                 </Badge>

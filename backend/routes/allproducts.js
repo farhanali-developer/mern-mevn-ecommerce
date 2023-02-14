@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const AllProducts = require('../models/allproducts')
+const Cart = require('../models/cart')
 const Users = require('../models/users')
 const {paginate} = require('../middleware/pagination')
 
@@ -32,7 +33,7 @@ router.post('/login', async (req, res) => {
 
   res.cookie('jwt', token, {
     httpOnly: true,
-    //sameSite: 'none',
+    // sameSite: 'none',
     //secure: true,
     maxAge: 24 * 60 * 60 * 1000 //1 day validity
   })
@@ -86,7 +87,8 @@ router.post('/signup', async (req, res) => {
   const newUser = new Users({
     full_name: req.body.full_name,
     email: req.body.email,
-    password: hashedPassword
+    password: hashedPassword,
+    role: req.body.role
   });
 
   const addUser = await newUser.save()
@@ -137,6 +139,48 @@ router.put('/update/:id', async (req, res) => {
   )
   res.json(updateProduct)
 })
+
+
+
+
+
+//CART
+
+router.get('get_cart_data', async (req, res) => {
+  const cartData = await Cart.findOne({userId: req.id})
+  res.send(cartData)
+})
+
+router.post('/add_to_cart', async (req, res) => {
+  
+  const newCart = new Cart(
+    req.body // What the Vue App is sending
+  ); 
+  const saveCart = await newCart.save() // mongo save method
+  res.json(saveCart) // respond with json to our post endpoint
+});
+
+// Update a Cart Product by id
+router.put('/update_cart_item/:id', async (req, res) => {
+  const updateCartProduct = await Cart.updateOne(
+    { _id: req.params.id }, 
+    { $set: req.body }
+  )
+  res.json(updateCartProduct)
+})
+
+// Delete a Product by id
+router.delete('/delete_cart_item/:id', async (req, res) => {
+  const deleteProductFromCart = await Cart.findByIdAndDelete({ userId : req.params.id })
+  res.json(deleteProductFromCart)
+})
+
+router.delete('/deleteAll/', async (req, res) => {
+  const deleteAllProducts = await Cart.deleteMany()
+  res.json(deleteAllProducts)
+})
+
+
 
 
 

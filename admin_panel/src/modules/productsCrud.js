@@ -45,17 +45,19 @@ const getProducts = () => {
     }
   }
   
-   const newProduct = async () => { 
-      const data = {
-        title: state.value.title,
-        description: state.value.description,
-        thumbnail: state.value.thumbnail,
-        brand: state.value.brand,
-        category: state.value.category,
-        sale: state.value.sale
-      }
+   const newProduct = async (data) => { 
+      // const data = {
+      //   title: state.value.title,
+      //   description: state.value.description,
+      //   thumbnail: state.value.thumbnail,
+      //   brand: state.value.brand,
+      //   category: state.value.category,
+      //   sale: state.value.sale
+      // }
+      const rawObject = JSON.parse(JSON.stringify(data.value));
+      // console.log(rawObject)
 
-    const res = await axios.post("/add_product", data, {headers: { "Content-Type": "application/json" },})
+    const res = await axios.post("/add_product", rawObject, {headers: { "Content-Type": "application/json" },})
     return "added"
       // return res
    }

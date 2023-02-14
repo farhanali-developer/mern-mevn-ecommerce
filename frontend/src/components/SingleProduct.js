@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -9,12 +9,14 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { Link, useParams } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import axios from 'axios'
+import { Context } from '../context';
 
 export default function SingleProduct() {
     const { id } = useParams()
     
 
     const [Products, setProducts] = useState([])
+    const [cartProducts, setCartProducts] = useState([])
 
     const fetchData = async () => {
       try {
@@ -27,11 +29,38 @@ export default function SingleProduct() {
         } catch (error) {
           console.log("error", error);
         }
-      };
+    };
+
+    const fetchCartData = async (limit, page) => {
+        try {
+            const url = `http://127.0.0.1:5000/api/get_cart_data`;
+            const res = await axios.get(url);
+            if(res){
+              console.log(res)
+            //   setCartProducts(results);
+            }
+            
+          } catch (error) {
+            console.log("error", error);
+          }
+    };
 
     useEffect(() => {
         fetchData();
+        fetchCartData();
     }, []);
+
+    const { dispatch } = useContext(Context)
+
+    function cartFunction(id){
+        console.log("Product ID: " + id)
+    }
+
+
+
+
+
+    
 
 
   return (
@@ -58,8 +87,9 @@ export default function SingleProduct() {
                                 <Link to="/wishlist" style={{textDecoration: "none"}}>
                                     <Button variant="outlined" size="large"><FavoriteBorderIcon />Add to wishlist</Button>
                                 </Link>
+                                    <Button variant="contained" size="large" color="success" onClick={() => dispatch({type: 'ADD_TO_CART', payload: Products})}>Add to cart</Button>
                                 <Link to="/cart" style={{textDecoration: "none"}}>
-                                    <Button variant="contained" size="large" color="success">Add to cart</Button>
+                                    {/* <Button variant="contained" size="large" color="success" onClick={() => cartFunction(Products?._id)}>Add to cart</Button> */}
                                 </Link>
                             </Stack>
                         </div>
