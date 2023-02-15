@@ -36,11 +36,11 @@ router.post('/login', async (req, res) => {
     // sameSite: 'none',
     //secure: true,
     maxAge: 24 * 60 * 60 * 1000 //1 day validity
-  })
+  }).json({token})
 
- res.send({
-   message: "Success"
-  })
+//  res.send({
+//    message: "Success"
+//   })
   // res.json(token)
 })
 
@@ -88,6 +88,7 @@ router.post('/signup', async (req, res) => {
     full_name: req.body.full_name,
     email: req.body.email,
     password: hashedPassword,
+    address: req.body.address,
     role: req.body.role
   });
 

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import axios from "axios"
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -20,6 +21,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import { Context } from '../context';
+import checkStorage from '../utils/checkCookie';
 
 const darkTheme = createTheme({
     palette: {
@@ -84,8 +86,6 @@ export default function Navbar() {
     itemCount = itemCount + cart[key].qty
   }
 
-  console.log(itemCount)
-
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -103,9 +103,15 @@ export default function Navbar() {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    const res = await axios.post("/logout", { withCredentials: true,
+    credentials: "include"});
+
     localStorage.removeItem("jwt")
+
+        console.log(res)
   }
+
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -124,13 +130,25 @@ export default function Navbar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <Link to="/login">
+      {checkStorage() ?
+      <>
+      <Link to="/login" style={{ textDecoration: "none", color: "#000"}}>
         <MenuItem onClick={handleMenuClose}>Login</MenuItem>
       </Link>
-      <Link to="/signup">
+      <Link to="/signup" style={{ textDecoration: "none", color: "#000"}}>
         <MenuItem onClick={handleMenuClose}>Register</MenuItem>
       </Link>
+      </>
+      :
+      <>
+      <Link to="/profile" style={{ textDecoration: "none", color: "#000"}}>
+        <MenuItem>Profile</MenuItem>
+      </Link>
       <MenuItem onClick={logout}>Logout</MenuItem>
+      </>
+      }
+      
+      
     </Menu>
   );
 

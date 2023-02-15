@@ -16,6 +16,7 @@ export default function Register() {
         full_name: "",
         email : "",
         password : "",
+        address: "",
         role: "user"
     })
 
@@ -31,7 +32,7 @@ export default function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const res = await axios.post("http://127.0.0.1:5000/api/signup", state, { withCredentials: true,
+        const res = await axios.post("/signup", state, { withCredentials: true,
         headers: 
           { 
             "Content-Type": "application/json",

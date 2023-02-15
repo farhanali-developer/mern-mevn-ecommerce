@@ -20,7 +20,7 @@ export default function SingleProduct() {
 
     const fetchData = async () => {
       try {
-            const url = `http://127.0.0.1:5000/api/product/${id}`;
+            const url = `/product/${id}`;
             const res = await axios.get(url);
             if(res){
                 setProducts(res.data);
@@ -31,23 +31,23 @@ export default function SingleProduct() {
         }
     };
 
-    const fetchCartData = async (limit, page) => {
-        try {
-            const url = `http://127.0.0.1:5000/api/get_cart_data`;
-            const res = await axios.get(url);
-            if(res){
-              console.log(res)
-            //   setCartProducts(results);
-            }
+    // const fetchCartData = async (limit, page) => {
+    //     try {
+    //         const url = `/get_cart_data`;
+    //         const res = await axios.get(url);
+    //         if(res){
+    //           console.log(res)
+    //         //   setCartProducts(results);
+    //         }
             
-          } catch (error) {
-            console.log("error", error);
-          }
-    };
+    //       } catch (error) {
+    //         console.log("error", error);
+    //       }
+    // };
 
     useEffect(() => {
         fetchData();
-        fetchCartData();
+        // fetchCartData();
     }, []);
 
     const { dispatch } = useContext(Context)

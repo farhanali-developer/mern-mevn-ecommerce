@@ -11,6 +11,7 @@ import AllProducts from './components/AllProducts';
 import { Provider } from './context';
 import Login from './components/Login';
 import Register from './components/Register';
+import Profile from './components/Profile';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Register />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
       <Footer />
     </Provider>

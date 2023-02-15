@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Box from '@mui/material/Box';
@@ -10,12 +10,9 @@ import Button from '@mui/material/Button';
 import { common } from '@mui/material/colors';
 const whiteColor = common.white;
 
-export default function Login() {
+export default function Profile() {
 
-    const [state , setState] = useState({
-        email : "",
-        password : ""
-    })
+    const [state , setState] = useState([])
 
     const navigate = useNavigate();
 
@@ -29,18 +26,30 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const res = await axios.post("/login", state, { withCredentials: true,
+        const res = await axios.post("/profile", state, { withCredentials: true,
         headers: 
           { 
             "Content-Type": "application/json",
           },
           
         })
-
-        localStorage.setItem("jwt", JSON.stringify(res.data.token))
-
-        // navigate("/");
     }
+
+    const fetchData = async () => {
+        try {
+            const url = '/user';
+            const res = await axios.get(url);
+            // console.log(res.data)
+            setState(res.data)
+            
+          } catch (error) {
+            console.log("error", error);
+          }
+    };
+
+    useEffect(() => {
+        fetchData();
+      }, []);
 
     
 
@@ -49,7 +58,7 @@ export default function Login() {
         <Box
       component="form"
       sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
+        '& .MuiTextField-root': { m: 1, },
         "input, label, h2, a": {color: whiteColor}, "fieldset": {borderColor: whiteColor}
       }}
       noValidate
@@ -59,38 +68,59 @@ export default function Login() {
     >
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{py:4, px: 4}}>
         <Grid item xs={12}>
-            <h2 style={{textAlign: "center"}}>Login</h2>
+            <h2 style={{textAlign: "center"}}>Profile</h2>
         </Grid>
         <Grid item xs={12}>
             <TextField
             required
-            id="outlined-required"
+            id="userFullName"
+            label="Full Name"
+            type="text"
+            fullWidth
+            name="full_name"
+            value={state.full_name || ""}
+            onChange={handleChange}
+            />
+        </Grid>
+        <Grid item xs={12}>
+            <TextField
+            required
+            id="userEmail"
             label="Email"
             type="email"
-            style={{width: "-webkit-fill-available"}}
+            fullWidth
             name="email"
-            defaultValue={state.email}
+            value={state.email || ""}
+            onChange={handleChange}
+            />
+        </Grid>
+        <Grid item xs={12}>
+            <TextField
+            required
+            id="userAddress"
+            label="Address"
+            type="text"
+            fullWidth
+            name="address"
+            value={state.address || ""}
             onChange={handleChange}
             />
         </Grid>
         <Grid item xs={12}>
             <TextField
                 required
-                id="outlined-password-input"
+                id="userPassword"
                 label="Password"
                 type="password"
                 name="password"
                 autoComplete="current-password"
-                style={{width: "-webkit-fill-available"}}
-                defaultValue={state.password}
+                fullWidth 
+                value={state.password || ""}
                 onChange={handleChange}
             />
         </Grid>
         <Grid item xs={12} sx={{textAlign: "center"}}>
             <Button variant="outlined" size="large" type="submit">Submit</Button>
-        </Grid>
-        <Grid item xs={12} sx={{textAlign: "center"}}>
-            <Link to="/signup" style={{textDecoration: "none", display: "block", marginTop: "20px"}}>Don't have an account?</Link>
         </Grid>
       </Grid>
     </Box>

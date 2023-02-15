@@ -33,10 +33,9 @@ export default function AllProducts() {
 
     const fetchData = async (limit, page) => {
       try {
-          const url = `http://127.0.0.1:5000/api?limit=${limit}&page=${page}`;
+          const url = `?limit=${limit}&page=${page}`;
           const res = await axios.get(url);
           if(res){
-            console.log(res)
             const {results, ...props} = res.data
             setProducts(results);
             setPageProps(props)
