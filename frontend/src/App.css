@@ -15,6 +15,10 @@ body{
   box-shadow: 0 0 4px #eeeeee;
 }
 
+input, label{
+  color: #fff !important;
+}
+
 .MuiPagination-ul{
   justify-content: center;
   margin-top: 50px !important;

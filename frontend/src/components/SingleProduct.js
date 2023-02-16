@@ -8,19 +8,25 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { Link, useParams } from 'react-router-dom';
 import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
 import axios from 'axios'
-import { Context } from '../context';
+import { CartContext } from '../context/cartContext';
+import { userContext } from '../context/userContext';
 
 export default function SingleProduct() {
     const { id } = useParams()
+
+    const productId = id;
     
 
     const [Products, setProducts] = useState([])
-    const [cartProducts, setCartProducts] = useState([])
+    const [qty, setQty] = useState()
+
+    const {user} = useContext(userContext)
 
     const fetchData = async () => {
       try {
-            const url = `/product/${id}`;
+            const url = `/product/${productId}`;
             const res = await axios.get(url);
             if(res){
                 setProducts(res.data);
@@ -31,31 +37,29 @@ export default function SingleProduct() {
         }
     };
 
-    // const fetchCartData = async (limit, page) => {
-    //     try {
-    //         const url = `/get_cart_data`;
-    //         const res = await axios.get(url);
-    //         if(res){
-    //           console.log(res)
-    //         //   setCartProducts(results);
-    //         }
-            
-    //       } catch (error) {
-    //         console.log("error", error);
-    //       }
-    // };
-
     useEffect(() => {
         fetchData();
-        // fetchCartData();
     }, []);
 
-    const { dispatch } = useContext(Context)
+    
 
-    function cartFunction(id){
-        console.log("Product ID: " + id)
+    const { addToCart } = useContext(CartContext)
+
+    const addCart = (id, qty, price) => {
+
+        const data = {
+            "userId": user?._id,
+            "product": id,
+            "quantity": qty,
+            "price": price
+        }
+
+        addToCart(data);
     }
 
+    function qtyChange(e){
+        setQty(e)
+    }
 
 
 
@@ -66,35 +70,36 @@ export default function SingleProduct() {
   return (
     <Container maxWidth="xl">
         <Box sx={{ width: '100%', m: 2 }}>
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 2 }} justifyContent="space-between">
-                    <Grid item xs={12} md={12} style={{ marginTop: "30px"}}>
-                        <h1 style={{color: "#fff"}}>{Products?.title}</h1>
-                    </Grid>
-                    <Grid item xs={12} md={5} style={{ marginTop: "30px"}}>
-                        <img style={{ height: "auto", width: "100%" }} src={`${Products?.thumbnail}`} alt="Product"/>
-                    </Grid>
-                    <Grid item xs={12} md={6} style={{ marginTop: "30px", color: "#fff"}}>
-                        <p>{Products?.description}</p>
-                        <div style={{marginTop: "50px"}}>
-                            <p><b>SKU:</b> ABC</p>
-                            <p><b>Category: </b>{Products?.category}</p>
-                            <p><b>Brand: </b> {Products?.brand}</p>
-                            <div style={{ fontWight: "bold", marginTop: "20px", marginBottom: "100px", textAlign: "left" }}>
-                                <s style={{ fontSize: "1.1rem", color: "#fff" }}>$12.00</s>
-                                <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#dc3545", marginLeft: "10px" }}>$8.99</span>
-                            </div>
-                            <Stack spacing={2} direction="row">
-                                <Link to="/wishlist" style={{textDecoration: "none"}}>
-                                    <Button variant="outlined" size="large"><FavoriteBorderIcon />Add to wishlist</Button>
-                                </Link>
-                                    <Button variant="contained" size="large" color="success" onClick={() => dispatch({type: 'ADD_TO_CART', payload: Products})}>Add to cart</Button>
-                                <Link to="/cart" style={{textDecoration: "none"}}>
-                                    {/* <Button variant="contained" size="large" color="success" onClick={() => cartFunction(Products?._id)}>Add to cart</Button> */}
-                                </Link>
-                            </Stack>
-                        </div>
-                    </Grid>
+            <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 2 }} justifyContent="space-between">
+                <Grid item xs={12} md={12} style={{ marginTop: "30px"}}>
+                    <h1 style={{color: "#fff"}}>{Products?.title}</h1>
                 </Grid>
+                <Grid item xs={12} md={5} style={{ marginTop: "30px"}}>
+                    <img style={{ height: "auto", width: "100%" }} src={`${Products?.thumbnail}`} alt="Product"/>
+                </Grid>
+                <Grid item xs={12} md={6} style={{ marginTop: "30px", color: "#fff"}}>
+                    <p>{Products?.description}</p>
+                    <div style={{marginTop: "50px"}}>
+                        <p><b>SKU:</b> ABC</p>
+                        <p><b>Category: </b>{Products?.category}</p>
+                        <p><b>Brand: </b> {Products?.brand}</p>
+                        <div style={{ fontWight: "bold", marginTop: "20px", marginBottom: "100px", textAlign: "left" }}>
+                            <s style={{ fontSize: "1.1rem", color: "#fff" }}>$12.00</s>
+                            <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#dc3545", marginLeft: "10px" }}>${Products?.price}</span>
+                        </div>
+                        <TextField id="outlined-basic" label="Quantity" variant="outlined" sx={{mb:5}} onChange={(e) => qtyChange(e.target.value)} />
+                        <Stack spacing={2} direction="row">
+                            <Link to="/wishlist" style={{textDecoration: "none"}}>
+                                <Button variant="outlined" size="large"><FavoriteBorderIcon />Add to wishlist</Button>
+                            </Link>
+                                <Button variant="contained" size="large" color="success" onClick={() => addCart(Products?._id, qty, Products?.price)}>Add to cart</Button>
+                            <Link to="/cart" style={{textDecoration: "none"}}>
+                                {/* <Button variant="contained" size="large" color="success" onClick={() => cartFunction(Products?._id)}>Add to cart</Button> */}
+                            </Link>
+                        </Stack>
+                    </div>
+                </Grid>
+            </Grid>
         </Box>
     </Container>
   );

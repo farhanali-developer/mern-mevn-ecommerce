@@ -36,7 +36,16 @@ router.post('/login', async (req, res) => {
     // sameSite: 'none',
     //secure: true,
     maxAge: 24 * 60 * 60 * 1000 //1 day validity
-  }).json({token})
+  }).json({
+    _id: user._id,
+    full_name: user.full_name,
+    email: user.email,
+    role: user.role,
+    password: user.password,
+    address: user.address,
+    createdAt: user.createdAt,
+    token
+  })
 
 //  res.send({
 //    message: "Success"
@@ -81,6 +90,8 @@ router.post('/logout', async (req, res) => {
 
 router.post('/signup', async (req, res) => {
 
+  const checkUser = await Users.findOne({email: req.body.email})
+
   const salt = await bcrypt.genSalt(10)
   const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
@@ -92,9 +103,16 @@ router.post('/signup', async (req, res) => {
     role: req.body.role
   });
 
-  const addUser = await newUser.save()
-  const {password, ...data} = await addUser.toJSON();
-  res.send(data)
+  if(!checkUser){
+    const addUser = await newUser.save()
+    const {password, ...data} = await addUser.toJSON();
+    res.send(data)  
+  }
+  else{
+    res.send("User Exists.");
+  }
+
+  
 })
 
 // Add new Product
@@ -147,19 +165,55 @@ router.put('/update/:id', async (req, res) => {
 
 //CART
 
-router.get('get_cart_data', async (req, res) => {
-  const cartData = await Cart.findOne({userId: req.id})
-  res.send(cartData)
+//GET CART DATA
+router.get('/cart', async (req, res) => {
+  const userToken = req.cookies['jwt']
+  const decoded = jwt.verify(userToken, "secret")
+  const cartData = await Cart.findOne({userId: decoded?._id}).populate("products.product")
+  res.json(cartData)
 })
 
-router.post('/add_to_cart', async (req, res) => {
-  
-  const newCart = new Cart(
-    req.body // What the Vue App is sending
-  ); 
-  const saveCart = await newCart.save() // mongo save method
-  res.json(saveCart) // respond with json to our post endpoint
+
+
+//ADD CART DATA
+router.post("/cart", async (req, res) => {
+  const { userId, product, quantity, price } = req.body;
+
+  try {
+    let cart = await Cart.findOne({ userId });
+
+    if (cart) {
+      //cart exists for user
+      let itemIndex = cart.products.findIndex(p => p.product == product);
+
+      if (itemIndex > -1) {
+        //product exists in the cart, update the quantity
+        let productItem = cart.products[itemIndex];
+        productItem.quantity = quantity;
+        cart.products[itemIndex] = productItem;
+      } else {
+        //product does not exists in cart, add new item
+        cart.products.push({ product, quantity, price });
+      }
+      cart = await cart.save();
+      return res.status(201).send(cart);
+    } else {
+      //no cart for user, create new cart
+      const newCart = await Cart.create({
+        userId,
+        products: [{ product, quantity, price }]
+      });
+
+      return res.status(201).send(newCart);
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Something went wrong");
+  }
 });
+
+
+
 
 // Update a Cart Product by id
 router.put('/update_cart_item/:id', async (req, res) => {

@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Grid from '@mui/material/Grid';
@@ -17,37 +16,29 @@ import TextField from '@mui/material/TextField';
 import { common } from '@mui/material/colors';
 import Container from '@mui/material/Container';
 
-import { Context } from '../context';
+import { CartContext } from '../context/cartContext';
 
 
 
 const whiteColor = common.white;
 
-function createData(
-    productImage,
-    title,
-    price,
-  ) {
-    return { productImage, title, price };
-  }
-  
-  const rows = [
-    createData('https://lanustech.vercel.app/assets/img/desktops-1.jpg', "Product Title", "$8.99"),
-    createData('https://lanustech.vercel.app/assets/img/desktops-1.jpg', "Product Title", "$8.99"),
-    createData('https://lanustech.vercel.app/assets/img/desktops-1.jpg', "Product Title", "$8.99"),
-    createData('https://lanustech.vercel.app/assets/img/desktops-1.jpg', "Product Title", "$8.99"),
-    createData('https://lanustech.vercel.app/assets/img/desktops-1.jpg', "Product Title", "$8.99"),
-  ];
-
 const Cart = () => {
+    
+    const { state, dispatch, cartData } = useContext(CartContext);
+    const [product, setProduct] = useState({});
 
-    const { state, dispatch } = useContext(Context);
-    const { cart } = state;
-    let total = 0;
+    console.log(cartData)
 
-    for(const [key, value] of Object.entries(cart)) {
-        total = total + cart[key].price * cart[key].qty;
-    }
+    // Products && Products.map((item) => {
+    //     console.log(item.productId)
+    // })
+
+    // const { cart } = state;
+    // let total = 0;
+
+    // for(const [key, value] of Object.entries(cart)) {
+    //     total = total + product.price * product.qty;
+    // }
 
 
   return (
@@ -69,16 +60,16 @@ const Cart = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                            {Object.entries(cart).map(([key, value]) => (
+                            {cartData && cartData?.products?.map((item) => (
                                 <TableRow
-                                key={cart[key]?.title}
+                                key={item?.product?._id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                 <TableCell component="th" scope="row">
-                                    <img src={`${cart[key]?.thumbnail}`} style={{ height: "50px", width: "50px", objectFit: "cover" }} alt="" />
+                                    <img src={`${item?.product?.thumbnail}`} style={{ height: "50px", width: "50px", objectFit: "cover" }} alt="" />
                                 </TableCell>
-                                <TableCell align="center">{cart[key]?.title}</TableCell>
-                                <TableCell align="center">{cart[key]?.price}</TableCell>
+                                <TableCell align="center">{item?.product?.title}</TableCell>
+                                <TableCell align="center">{item?.product?.price}</TableCell>
                                 <TableCell align="center">
                                     <TextField
                                         id="standard-number"
@@ -88,6 +79,7 @@ const Cart = () => {
                                             shrink: true,
                                         }}
                                         variant="standard"
+                                        value={item?.quantity}
                                     />
                                 </TableCell>
                                 <TableCell align="center">$8.99</TableCell>

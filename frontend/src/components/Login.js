@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Box from '@mui/material/Box';
@@ -8,14 +8,20 @@ import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { common } from '@mui/material/colors';
+import Alert from '@mui/material/Alert';
+import { userContext } from '../context/userContext';
 const whiteColor = common.white;
 
 export default function Login() {
+
+  const [message, setMessage] = useState();
 
     const [state , setState] = useState({
         email : "",
         password : ""
     })
+
+    const {setUser} = useContext(userContext)
 
     const navigate = useNavigate();
 
@@ -37,7 +43,14 @@ export default function Login() {
           
         })
 
-        localStorage.setItem("jwt", JSON.stringify(res.data.token))
+        if(res.data == "User not found"){
+          setMessage("Invalid email or password.");
+        }
+        else if(res.data == "Invalid Credentials"){
+          setMessage("Invalid email or password.");
+        }
+
+        setUser(res.data)
 
         // navigate("/");
     }
@@ -61,6 +74,11 @@ export default function Login() {
         <Grid item xs={12}>
             <h2 style={{textAlign: "center"}}>Login</h2>
         </Grid>
+       {message ? <>
+        <Grid item xs={12} sx={{mb:3}}>
+            <Alert severity="error">{message}</Alert>
+        </Grid>
+       </>: ""}
         <Grid item xs={12}>
             <TextField
             required

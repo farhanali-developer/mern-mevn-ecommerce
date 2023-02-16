@@ -8,9 +8,12 @@ import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { common } from '@mui/material/colors';
+import Alert from '@mui/material/Alert';
 const whiteColor = common.white;
 
 export default function Register() {
+
+  const [message, setMessage] = useState();
 
     const [state , setState] = useState({
         full_name: "",
@@ -40,12 +43,18 @@ export default function Register() {
           
         })
 
-        if(res.status == 200){
-          navigate("/login");
+        if(res.data == "User Exists."){
+            setMessage("The provided email already exists.");
         }
-        else{
-          console.log("Error")
-        }
+
+        console.log(res)
+
+        // if(res.status == 200){
+        //   navigate("/login");
+        // }
+        // else{
+        //   console.log("Error")
+        // }
         // console.log(JSON.stringify(state, null, 2))
     }
 
@@ -67,6 +76,9 @@ export default function Register() {
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{py:4, px: 4}}>
         <Grid item xs={12}>
             <h2 style={{textAlign: "center"}}>Register</h2>
+        </Grid>
+        <Grid item xs={12} sx={{mb:3}}>
+            <Alert severity="error">{message}</Alert>
         </Grid>
         <Grid item xs={12}>
             <TextField
