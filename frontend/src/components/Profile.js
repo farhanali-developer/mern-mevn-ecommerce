@@ -8,6 +8,11 @@ import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { common } from '@mui/material/colors';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import IconButton from '@mui/material/IconButton';
 const whiteColor = common.white;
 
 export default function Profile() {
@@ -50,6 +55,15 @@ export default function Profile() {
     useEffect(() => {
         fetchData();
       }, []);
+
+
+      const [showPassword, setShowPassword] = useState(false);
+
+      const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+      const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+      };
 
     
 
@@ -96,28 +110,40 @@ export default function Profile() {
         </Grid>
         <Grid item xs={12}>
             <TextField
-            required
-            id="userAddress"
-            label="Address"
-            type="text"
-            fullWidth
-            name="address"
-            value={state.address || ""}
-            onChange={handleChange}
+              id="userAddress"
+              label="Address"
+              multiline
+              variant="filled"
+              fullWidth
+              name="address"
+              value={state.address || ""}
+              onChange={handleChange}
             />
         </Grid>
         <Grid item xs={12}>
-            <TextField
-                required
-                id="userPassword"
-                label="Password"
-                type="password"
-                name="password"
-                autoComplete="current-password"
-                fullWidth 
-                value={state.password || ""}
-                onChange={handleChange}
-            />
+            <OutlinedInput
+            sx={{textAlign: "center"}}
+            id="userPassword"
+            type={showPassword ? 'text' : 'password'}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                  style={{color: "#fff"}}
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            label="Password"
+            name="password"
+            fullWidth
+            value={state.password || ""}
+            onChange={handleChange}
+          />
         </Grid>
         <Grid item xs={12} sx={{textAlign: "center"}}>
             <Button variant="outlined" size="large" type="submit">Submit</Button>

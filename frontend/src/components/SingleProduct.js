@@ -31,7 +31,6 @@ export default function SingleProduct() {
             if(res){
                 setProducts(res.data);
             }
-          
         } catch (error) {
           console.log("error", error);
         }
@@ -47,11 +46,18 @@ export default function SingleProduct() {
 
     const addCart = (id, qty, price) => {
 
+        const subTotal = qty*price;
+
         const data = {
             "userId": user?._id,
             "product": id,
             "quantity": qty,
-            "price": price
+            "price": price,
+            "subTotal": subTotal,
+            "cartTotal": {
+                "totalQuantity": qty,
+                "total": subTotal
+            }
         }
 
         addToCart(data);
@@ -87,7 +93,7 @@ export default function SingleProduct() {
                             <s style={{ fontSize: "1.1rem", color: "#fff" }}>$12.00</s>
                             <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#dc3545", marginLeft: "10px" }}>${Products?.price}</span>
                         </div>
-                        <TextField id="outlined-basic" label="Quantity" variant="outlined" sx={{mb:5}} onChange={(e) => qtyChange(e.target.value)} />
+                        <TextField id="outlined-basic" label="Quantity" variant="outlined" sx={{mb:5}} defaultValue="1" onChange={(e) => qtyChange(e.target.value)} />
                         <Stack spacing={2} direction="row">
                             <Link to="/wishlist" style={{textDecoration: "none"}}>
                                 <Button variant="outlined" size="large"><FavoriteBorderIcon />Add to wishlist</Button>

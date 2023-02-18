@@ -12,12 +12,13 @@ const CartSchema = new mongoose.Schema(
             ref: "products"
           },
           quantity: Number,
-          price: Number
+          price: Number,
+          subTotal: Number
         }
       ],
-      active: {
-        type: Boolean,
-        default: true
+      cartTotal: {
+        totalQuantity: Number,
+        total: Number
       },
       modifiedOn: {
         type: Date,

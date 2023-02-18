@@ -15,8 +15,12 @@ body{
   box-shadow: 0 0 4px #eeeeee;
 }
 
-input, label{
+input, label, textarea{
   color: #fff !important;
+}
+
+.css-leqjib-MuiInputBase-root-MuiFilledInput-root:before{
+  border-bottom: 1px solid rgba(255, 255, 255, 1) !important;
 }
 
 .MuiPagination-ul{

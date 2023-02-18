@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const AllProducts = require('../models/allproducts')
@@ -177,7 +178,8 @@ router.get('/cart', async (req, res) => {
 
 //ADD CART DATA
 router.post("/cart", async (req, res) => {
-  const { userId, product, quantity, price } = req.body;
+  const { userId, product, quantity, price, subTotal, cartTotal } = req.body;
+  const {totalQuantity, total } = cartTotal;
 
   try {
     let cart = await Cart.findOne({ userId });
@@ -189,11 +191,21 @@ router.post("/cart", async (req, res) => {
       if (itemIndex > -1) {
         //product exists in the cart, update the quantity
         let productItem = cart.products[itemIndex];
-        productItem.quantity = quantity;
+        productItem.quantity = +productItem.quantity + +quantity;
+        productItem.subTotal = +productItem.subTotal + +subTotal;
         cart.products[itemIndex] = productItem;
+
+        let totalCart = cart.cartTotal;
+        totalCart.totalQuantity = +productItem.quantity + +productItem.quantity;
+        totalCart.total = +productItem.subTotal + +productItem.subTotal;
       } else {
         //product does not exists in cart, add new item
-        cart.products.push({ product, quantity, price });
+        cart.products.push({ product, quantity, price, subTotal });
+        let totalCart = cart.cartTotal;
+        let totalQuantity = +totalCart.totalQuantity + +quantity;
+        let total = +totalCart.total + +subTotal;
+        cart.cartTotal['totalQuantity'] = totalQuantity;
+        cart.cartTotal['total'] = total;
       }
       cart = await cart.save();
       return res.status(201).send(cart);
@@ -201,7 +213,8 @@ router.post("/cart", async (req, res) => {
       //no cart for user, create new cart
       const newCart = await Cart.create({
         userId,
-        products: [{ product, quantity, price }]
+        products: [{ product, quantity, price, subTotal }],
+        cartTotal: {totalQuantity, total}
       });
 
       return res.status(201).send(newCart);
@@ -213,21 +226,24 @@ router.post("/cart", async (req, res) => {
 });
 
 
-
-
-// Update a Cart Product by id
-router.put('/update_cart_item/:id', async (req, res) => {
-  const updateCartProduct = await Cart.updateOne(
-    { _id: req.params.id }, 
-    { $set: req.body }
-  )
-  res.json(updateCartProduct)
-})
-
 // Delete a Product by id
-router.delete('/delete_cart_item/:id', async (req, res) => {
-  const deleteProductFromCart = await Cart.findByIdAndDelete({ userId : req.params.id })
-  res.json(deleteProductFromCart)
+router.delete('/delete_cart_item/:userId/:productId', async (req, res) => {
+  // Define the user_id and product_id and prep them for the DB query
+  const user_id = mongoose.Types.ObjectId(req.params.userId);
+  const productToDelete = mongoose.Types.ObjectId(req.params.productId);
+
+  // Query and pull out the task by its id
+  const deleteProduct = await Cart.findOneAndUpdate(
+    { userId: user_id },
+    { $pull: { products: { product: productToDelete } } },
+    {new:true}
+  );
+
+  if(deleteProduct?.products?.length == 0){
+    await Cart.deleteOne({_id: deleteProduct?._id})
+  }
+
+  res.send(deleteProduct);
 })
 
 router.delete('/deleteAll/', async (req, res) => {

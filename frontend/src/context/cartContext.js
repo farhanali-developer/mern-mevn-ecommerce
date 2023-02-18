@@ -72,8 +72,14 @@ const Provider = ({ children }) => {
   }
   const removeFromCart = async (id) => {
     try {
-      const res = null; // Api call to remove to cart
+      const data = {
+        "userId": user?._id,
+        "productId": id
+      }
+
+      const res = await axios.delete(`/delete_cart_item/${user?._id}/${id}`); // Api call to remove to cart
       if(res.data) {
+        console.log(res)
         await fetchCart()
       }
     } catch (error) {

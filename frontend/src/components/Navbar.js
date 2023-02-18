@@ -81,9 +81,9 @@ export default function Navbar() {
   const { cartData } = useContext(CartContext)
   let itemCount = 0
 
-  // if(cartData.products){
-  //   itemCount = cartData?.products.length
-  // }
+  if(cartData.products){
+    itemCount = cartData?.products.length
+  }
 
 
 
