@@ -3,6 +3,9 @@ const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
+require("dotenv").config({ path: "./.env" });
+const port = process.env.PORT || 5000;
+const mongoUrl = process.env.MONGOURL
 
 // create out express app
 const app = express()
@@ -17,8 +20,8 @@ app.use(function(req, res, next) {
 })
 
 // database stuff
-const uri = "mongodb+srv://farhan:Icsm1458319@atlascluster.5wi8utm.mongodb.net/mevn-project";
-mongoose.connect(uri, {
+// const uri = "mongodb+srv://farhan:Icsm1458319@atlascluster.5wi8utm.mongodb.net/mevn-project";
+mongoose.connect(mongoUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -42,10 +45,10 @@ app.get("/", (res, req) => {
   res.send("yay home page")
 })
 
-const Products = require('./routes/allproducts');
-  app.use('/api', Products)
+const routes = require('./routes/allRoutes');
+  app.use('/api', routes)
 
 // start server
-app.listen(5000, () => {
+app.listen(port, () => {
   console.log("Listening at port 5000")
 })

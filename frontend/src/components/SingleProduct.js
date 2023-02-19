@@ -15,10 +15,7 @@ import { userContext } from '../context/userContext';
 
 export default function SingleProduct() {
     const { id } = useParams()
-
     const productId = id;
-    
-
     const [Products, setProducts] = useState([])
     const [qty, setQty] = useState()
 
@@ -66,12 +63,6 @@ export default function SingleProduct() {
     function qtyChange(e){
         setQty(e)
     }
-
-
-
-
-    
-
 
   return (
     <Container maxWidth="xl">

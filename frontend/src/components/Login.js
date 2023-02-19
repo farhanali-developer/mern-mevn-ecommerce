@@ -43,11 +43,21 @@ export default function Login() {
           
         })
 
-        if(res.data == "User not found"){
-          setMessage("Invalid email or password.");
+        // if(res.data == "User not found"){
+        //   setMessage("Invalid email or password.");
+        // }
+        // else if(res.data == "Invalid Credentials"){
+        //   setMessage("Invalid email or password.");
+        // }
+        // else if(res.status == 200){
+        //   setMessage("Invalid email or password.");
+        // }
+
+        if(res.status != 200){
+          setMessage(false)
         }
-        else if(res.data == "Invalid Credentials"){
-          setMessage("Invalid email or password.");
+        else{
+          setMessage(true)
         }
 
         setUser(res.data)
@@ -74,11 +84,11 @@ export default function Login() {
         <Grid item xs={12}>
             <h2 style={{textAlign: "center"}}>Login</h2>
         </Grid>
-       {message ? <>
         <Grid item xs={12} sx={{mb:3}}>
-            <Alert severity="error">{message}</Alert>
+        <Alert severity="success">Login Successful.</Alert>
+        <Alert severity="error">Invalid email or password.</Alert>
+          
         </Grid>
-       </>: ""}
         <Grid item xs={12}>
             <TextField
             required
