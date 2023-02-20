@@ -23,19 +23,19 @@ const postCart = async (req, res) => {
         if (itemIndex > -1) {
           //product exists in the cart, update the quantity
           let productItem = cart.products[itemIndex];
-          productItem.quantity = +productItem.quantity + +quantity;
-          productItem.subTotal = +productItem.subTotal + +subTotal;
+          productItem.quantity = quantity;
+          productItem.subTotal = subTotal;
           cart.products[itemIndex] = productItem;
   
           let totalCart = cart.cartTotal;
-          totalCart.totalQuantity = +productItem.quantity + +productItem.quantity;
-          totalCart.total = +productItem.subTotal + +productItem.subTotal;
+          totalCart.totalQuantity = totalQuantity;
+          totalCart.total = total;
         } else {
           //product does not exists in cart, add new item
           cart.products.push({ product, quantity, price, subTotal });
           let totalCart = cart.cartTotal;
-          let totalQuantity = +totalCart.totalQuantity + +quantity;
-          let total = +totalCart.total + +subTotal;
+          let totalQuantity = totalQuantity;
+          let total = total;
           cart.cartTotal['totalQuantity'] = totalQuantity;
           cart.cartTotal['total'] = total;
         }

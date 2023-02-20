@@ -20,7 +20,7 @@ app.use(function(req, res, next) {
 })
 
 // database stuff
-// const uri = "mongodb+srv://farhan:Icsm1458319@atlascluster.5wi8utm.mongodb.net/mevn-project";
+mongoose.set("strictQuery", false);
 mongoose.connect(mongoUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true

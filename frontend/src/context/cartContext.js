@@ -45,9 +45,6 @@ const Provider = ({ children }) => {
 
   // Setup Cart functionality
   const [cartData, setCartData] = useState([])
-  
-
-  // console.log(user)
 
   const fetchCart = async () => {
     try {
@@ -60,6 +57,7 @@ const Provider = ({ children }) => {
       console.log(error)
     }
   }
+
   const addToCart = async (item) => {
     try {
       const res = await axios.post('/cart', item); // Api call to add to cart
@@ -70,13 +68,20 @@ const Provider = ({ children }) => {
       console.log(error)
     }
   }
+
+  const updateCart = async (item) => {
+    try {
+      const res = await axios.put('/cart', item); // Api call to add to cart
+      if(res.data) {
+        await fetchCart()
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const removeFromCart = async (id) => {
     try {
-      const data = {
-        "userId": user?._id,
-        "productId": id
-      }
-
       const res = await axios.delete(`/delete_cart_item/${user?._id}/${id}`); // Api call to remove to cart
       if(res.data) {
         console.log(res)
@@ -95,7 +100,7 @@ const Provider = ({ children }) => {
 
 
   return (
-    <CartContext.Provider value={{ state, dispatch, addToCart, removeFromCart, cartData }}>
+    <CartContext.Provider value={{ state, dispatch, addToCart, updateCart, removeFromCart, cartData }}>
       {children}
     </CartContext.Provider>
   );

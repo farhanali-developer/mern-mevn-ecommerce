@@ -13,7 +13,7 @@ router.route('/logout').post(userLogout)
 router.route('/signup').post(userSignup)
 
 // All AllProducts routes
-router.route('/', paginate(AllProducts)).get(getAllProducts)
+router.route('/').get(paginate(AllProducts), getAllProducts)
 router.route('/add_product').post(addProduct)
 router.route('/csv_products').post(csvImport)
 router.route('/product/:id').get(getProductById)
@@ -22,7 +22,7 @@ router.route('/deleteAll/').delete(deleteAllProducts)
 router.route('/update/:id').put(updateById)
 
 // Cart Routes
-router.route('/cart').get(getCart).post(postCart)
+router.route('/cart').get(getCart).post(postCart).put(postCart)
 router.route('/delete_cart_item/:userId/:productId').delete(deleteCart)
 router.route('/deleteAll/').delete(deleteAll)
 

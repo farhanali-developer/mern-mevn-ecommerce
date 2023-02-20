@@ -20,6 +20,7 @@ export default function SingleProduct() {
     const [qty, setQty] = useState()
 
     const {user} = useContext(userContext)
+    const { addToCart } = useContext(CartContext)
 
     const fetchData = async () => {
       try {
@@ -39,7 +40,7 @@ export default function SingleProduct() {
 
     
 
-    const { addToCart } = useContext(CartContext)
+    
 
     const addCart = (id, qty, price) => {
 
