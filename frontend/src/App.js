@@ -1,19 +1,17 @@
-// import logo from './logo.svg';
 import './App.css';
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import { Routes, Route } from 'react-router-dom'
+import axios from 'axios';
 import Navbar from './components/Navbar';
-import Dashboard from './components/Dashboard';
-import Footer from './components/Footer';
+// import Footer from './components/Footer';
 import SingleProduct from './components/SingleProduct';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import AllProducts from './components/AllProducts';
-import { Provider } from './context/cartContext';
 import Login from './components/Login';
 import Register from './components/Register';
 import Profile from './components/Profile';
-import axios from 'axios';
+import { Provider } from './context/cartContext';
 import { userContext } from './context/userContext';
 
 function App() {
@@ -31,12 +29,11 @@ function App() {
 
   useEffect(()=>{
     fetchData();    
-  },[])
+  });
 
   return (
     <Provider>
       <Navbar />
-      
       <Routes>
         <Route path="/" element={<AllProducts />} exact />
         <Route path="/product/:id" element={<SingleProduct />} />
@@ -46,7 +43,7 @@ function App() {
         <Route path="/signup" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>
-      <Footer />
+      {/* <Footer /> */}
     </Provider>
   );
 }
