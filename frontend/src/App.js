@@ -1,5 +1,5 @@
 import './App.css';
-import { useEffect, useContext } from 'react';
+import { useEffect, useContext, useState } from 'react';
 import { Routes, Route } from 'react-router-dom'
 import axios from 'axios';
 import Navbar from './components/Navbar';
@@ -16,20 +16,25 @@ import { userContext } from './context/userContext';
 
 function App() {
 
-  const {setUser} = useContext(userContext)
+  const { setUser } = useContext(userContext)
 
   const fetchData = async () => {
     try{
       const res = await axios.get('/user');
-      setUser(res.data)
+      setUser(res.data);
     }
-    catch(e){
-      console.log(e)
+    catch(error){
+      if (error.response && error.response.status === 404) {
+        // User not found, handle accordingly
+        console.log('User not found.');
+      } else {
+        console.log(error);
+      }
     }
   }
 
   useEffect(()=>{
-    fetchData();    
+    fetchData();
   }, []);
 
   return (

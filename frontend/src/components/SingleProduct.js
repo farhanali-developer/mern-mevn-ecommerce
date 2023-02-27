@@ -18,7 +18,7 @@ export default function SingleProduct() {
     const [qty, setQty] = useState(0)
     const [open, setOpen] = useState(false);
 
-    const {user} = useContext(userContext)
+    const { user } = useContext(userContext)
     const { addToCart } = useContext(CartContext)
 
     const fetchData = async () => {

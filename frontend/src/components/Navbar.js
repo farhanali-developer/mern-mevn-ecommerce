@@ -64,7 +64,7 @@ export default function Navbar() {
   const { cartData } = useContext(CartContext)
   let itemCount = 0
 
-  if(cartData.products){
+  if(cartData?.products){
     itemCount = cartData?.products.length
   }
 
@@ -88,9 +88,9 @@ export default function Navbar() {
   };
 
 
-  const {isLoggedIn, logout} = useContext(userContext)
+  const {isLoggedIn, logout, isGuest} = useContext(userContext)
   const menuItems = () => {
-    return isLoggedIn() ? [
+    return isLoggedIn() && !isGuest() ? [
       <Link to="/profile" style={{ textDecoration: "none", color: "#000"}}>
         <MenuItem>Profile</MenuItem>
       </Link>,

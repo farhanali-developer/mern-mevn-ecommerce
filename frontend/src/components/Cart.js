@@ -45,11 +45,11 @@ const Cart = () => {
 
     const handleDialogOpen = () => {
         setOpen(true);
-      };
+    };
     
-      const handleDialogClose = () => {
+    const handleDialogClose = () => {
         setOpen(false);
-      };
+    };
 
     function qtyChange(id, qty, price){
         qtyUpdate(id, qty, price)
@@ -84,17 +84,14 @@ const Cart = () => {
         }
     }
 
-
-
-    
-      const openSnackBar = () => {
+    const openSnackBar = () => {
         setState({ open: true });
         setTransition(() => TransitionDown);
-      };
-    
-      const handleClose = () => {
+    };
+
+    const handleClose = () => {
         setState({ ...state, open: false });
-      };
+    };
 
 
   return (

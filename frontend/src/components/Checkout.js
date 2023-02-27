@@ -188,6 +188,13 @@ export default function Checkout() {
       paymentMethod: '',
     },
   );
+  const [state, setState] = useState({
+    open: false,
+    Transition: 'SlideTransition'
+  });
+
+  const [transition, setTransition] = useState(undefined);
+  const [alert, setAlert] = useState("")
 
   const navigate = useNavigate();
 
@@ -238,31 +245,22 @@ export default function Checkout() {
     checkbox ? setCheck(true) : setCheck(false);
   }
 
-  const finalOrder = async () => {
-    try {
-        handleDialogClose()
-        const res = await axios.post('/order', orderData);
-        if(res.status < 400){
-          setAlert("Order Confirmed! Thank you for ordering with us.");
-          setSeverity("success");
-          openSnackBar()
-          setTimeout(()=> {
-            navigate("/");
-           }, 3000);
-        }
-        else{
-          setAlert("Sorry! An error occured.");
-          setSeverity("error");
-          openSnackBar()
-        }
-      } catch (error) {
-        console.log("error", error);
-      }
+  const handleDialogOpen = () => {
+    setOpen(true);
   };
 
-  useEffect(() => {
-      setUpdatedUserData(user)
-  }, [user]);
+  const handleDialogClose = () => {
+    setOpen(false);
+  };
+
+  const openSnackBar = () => {
+    setState({ open: true });
+    setTransition(() => TransitionDown);
+  };
+
+  const handleClose = () => {
+    setState({ ...state, open: false });
+  };
 
   const handleChange = (event) => {
     setUpdatedUserData({
@@ -271,7 +269,7 @@ export default function Checkout() {
     });
   }
 
-  const handleContactSubmit = async (e) => {
+  const handleContactSubmit = (e) => {
     e.preventDefault();
 
     setOrderData({
@@ -300,31 +298,31 @@ export default function Checkout() {
     })
   }
 
-  const handleDialogOpen = () => {
-    setOpen(true);
+  const finalOrder = async () => {
+    try {
+        handleDialogClose()
+        const res = await axios.post('/order', orderData);
+        if(res.status < 400){
+          setAlert("Order Confirmed! Thank you for ordering with us.");
+          setSeverity("success");
+          openSnackBar()
+          setTimeout(()=> {
+            navigate("/");
+           }, 3000);
+        }
+        else{
+          setAlert("Sorry! An error occured.");
+          setSeverity("error");
+          openSnackBar()
+        }
+      } catch (error) {
+        console.log("error", error);
+      }
   };
 
-  const handleDialogClose = () => {
-    setOpen(false);
-  };
-
-  const [state, setState] = useState({
-    open: false,
-    Transition: 'SlideTransition'
-});
-
-  const [transition, setTransition] = useState(undefined);
-  const [alert, setAlert] = useState("")
-//   const { vertical, horizontal, open } = state;
-
-  const openSnackBar = () => {
-    setState({ open: true });
-    setTransition(() => TransitionDown);
-  };
-
-  const handleClose = () => {
-    setState({ ...state, open: false });
-  };
+  useEffect(() => {
+      setUpdatedUserData(user)
+  }, [user, cartData]);
 
   const stepData = () => {
     return activeStep === 0 ? [
@@ -337,22 +335,22 @@ export default function Checkout() {
                   <Box style={{marginTop: "50px"}}>
                     <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 2 }} justifyContent="space-between">
                         <Grid item xs={12} md={6}>
-                            <TextField id="fName" label="First Name" variant="outlined" fullWidth  />
+                            <TextField id="fName" label="First Name" variant="outlined" name="first_name"  onChange={handleChange} fullWidth  />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField id="lName" label="Last Name" variant="outlined" fullWidth  />
+                            <TextField id="lName" label="Last Name" variant="outlined" name="last_name" onChange={handleChange} fullWidth  />
                     </Grid>
                         <Grid item xs={12} md={6} style={{ marginTop: "30px"}}>
-                            <TextField id="phone" label="Phone" type="number" variant="outlined" fullWidth  />
+                            <TextField id="phone" label="Phone" type="number" variant="outlined" name="phone" onChange={handleChange} fullWidth  />
                         </Grid>
                         <Grid item xs={12} md={6} style={{ marginTop: "30px"}}>
-                            <TextField id="email" label="Email" type="email" variant="outlined" fullWidth  />
+                            <TextField id="email" label="Email" type="email" variant="outlined" name="email" onChange={handleChange} fullWidth  />
                         </Grid>
                         <Grid item xs={12} style={{ marginTop: "30px"}}>
-                            <TextField id="address" label="Address" type="textarea" variant="outlined" multiline fullWidth  />
+                            <TextField id="address" label="Address" type="textarea" variant="outlined" name="address" onChange={handleChange} multiline fullWidth  />
                         </Grid>
                         <Grid item xs={12} style={{ marginTop: "30px"}}>
-                            <Button variant="contained" onClick={handleNext} style={{textAlign: "right", display: "block", marginLeft: "auto"}} size="large">Submit</Button>
+                            <Button variant="contained" onClick={handleContactSubmit} style={{textAlign: "right", display: "block", marginLeft: "auto"}} size="large">Submit</Button>
                         </Grid>
                         
                     </Grid>

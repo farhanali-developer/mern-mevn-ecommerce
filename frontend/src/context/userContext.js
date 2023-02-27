@@ -14,11 +14,15 @@ export const UserProvider = ({children}) => {
     }
 
     const isLoggedIn = () => {
-        return user?._id ? true : false
+        return user?._id && !user?.isGuest ? true : false
+    }
+
+    const isGuest = () => {
+        return user?._id && user?.isGuest ? true : false
     }
 
 
-    return <userContext.Provider value={{user, setUser, logout, isLoggedIn}}>
+    return <userContext.Provider value={{user, setUser, logout, isLoggedIn, isGuest}}>
         {children}
     </userContext.Provider>
 }

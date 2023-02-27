@@ -5,6 +5,8 @@ require("dotenv").config({ path: "../.env" });
 const secret = process.env.SECRET
 
 const userLogin = async (req, res) => {
+  const origin = req.get('origin');
+
   const user = await Users.findOne({email: req.body.email})
   
   if(!user){
@@ -20,7 +22,19 @@ const userLogin = async (req, res) => {
     })
   }
 
-  const token = jwt.sign({ _id: user._id, password: req.body.password }, secret)
+  if(origin == "http://localhost:3000" && req.body.role !== "user"){
+    return res.status(400).send({
+      message: "Not allowed to sign in."
+    })
+  }
+
+  if(origin == "http://localhost:5173" && req.body.role !== "admin"){
+    return res.status(400).send({
+      message: "Not allowed to sign in."
+    })
+  }
+
+  const token = jwt.sign({ _id: user._id}, secret)
 
   res.cookie('jwt', token, {
     httpOnly: true,
@@ -38,28 +52,54 @@ const userLogin = async (req, res) => {
 }
 
 const userData = async (req, res) => {
-    try {
-      const cookie = req.cookies['jwt']
-  
-      const claims = jwt.verify(cookie, secret)
-  
-      if(!claims){
-        return res.status(401).send({
-          message: "Unauthenticated."
-        })
+  try {
+    const cookie = req.cookies['jwt'];
+    let claims;
+
+    // Check if JWT token exists in cookies
+    if(cookie){
+      // If token exists, verify it
+      claims = jwt.verify(cookie, secret);
+    } 
+    else {
+      // If token doesn't exist, create a new guest user
+      let guestUser = await Users.findOne({isGuest: true});
+
+      if (!guestUser) {
+        const newUser = new Users({isGuest: true});
+        guestUser = await newUser.save();
       }
-  
-      const user = await Users.findOne({_id: claims._id})
-  
-      const {password, ...data} = await user.toJSON();
-      // const data = await user.toJSON();
-  
-      res.send(data)
-    } catch (error) {
-      return res.status(401).send({
-        message: "Unauthenticated."
-      })
+      
+      claims = {_id: guestUser?._id};
+
+      // Create a new JWT token with guest user's id
+      const token = jwt.sign(claims, secret);
+
+      // Set the JWT token as a cookie in the response
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 //1 day validity
+      });
     }
+
+    // Fetch user data from MongoDB using the claims in the JWT token
+    const user = await Users.findOne({_id: claims?._id})
+    if(user){
+      const { password, ...data } = await user.toJSON();
+      res.send(data);
+    }
+
+    else{
+      return res.status(404).send({
+        message: "User not found."
+      });
+    }
+
+  } catch (error) {
+    return res.status(401).send({
+      message: "Unauthenticated."
+    });
+  }
 }
 
 const userLogout = async (req, res) => {

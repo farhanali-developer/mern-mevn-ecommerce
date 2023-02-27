@@ -7,6 +7,7 @@ const UsersSchema = new mongoose.Schema({
   address: String,
   password: String,
   role: String,
+  isGuest: Boolean
 },  { timestamps: true })
 
 module.exports = mongoose.model('users', UsersSchema)

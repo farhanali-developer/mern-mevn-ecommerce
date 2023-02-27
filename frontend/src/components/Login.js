@@ -21,7 +21,8 @@ export default function Login() {
 
     const [loginInfo , setLoginInfo] = useState({
         email : "",
-        password : ""
+        password : "",
+        role: "user"
     })
     const [state, setState] = useState({
       open: false,
