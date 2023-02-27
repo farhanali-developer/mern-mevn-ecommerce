@@ -24,12 +24,13 @@ function App() {
       setUser(res.data)
     }
     catch(e){
+      console.log(e)
     }
   }
 
   useEffect(()=>{
     fetchData();    
-  });
+  }, []);
 
   return (
     <Provider>

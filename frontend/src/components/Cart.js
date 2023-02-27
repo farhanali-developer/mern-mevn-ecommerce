@@ -3,7 +3,6 @@ import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../context/cartContext';
 import { userContext } from '../context/userContext';
-import { OrderContext } from '../context/orderContext';
 import { Grid, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, TextField, colors, Container, Snackbar, IconButton, Slide, Alert as MuiAlert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ThemeProvider, createTheme } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -34,9 +33,15 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const Cart = () => {
     
     const { cartData, updateCart, removeFromCart } = useContext(CartContext);
-    const { addOrder } = useContext(OrderContext);
     const { user } = useContext(userContext);
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
+    const [state, setState] = useState({
+        open: false,
+        Transition: 'SlideTransition'
+    });
+
+    const [transition, setTransition] = useState(undefined);
+    const [alert, setAlert] = useState("")
 
     const handleDialogOpen = () => {
         setOpen(true);
@@ -80,14 +85,7 @@ const Cart = () => {
     }
 
 
-    const [state, setState] = useState({
-        open: false,
-        Transition: 'SlideTransition'
-    });
 
-      const [transition, setTransition] = useState(undefined);
-      const [alert, setAlert] = useState("")
-    //   const { vertical, horizontal, open } = state;
     
       const openSnackBar = () => {
         setState({ open: true });
@@ -101,14 +99,14 @@ const Cart = () => {
 
   return (
     <Container>
-        <Box sx={{ width: '100%', m: 2 }}>
+        <Box sx={{ width: '100%'}}>
             <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 2 }} justifyContent="center">
                 <Grid item xs={12} style={{ marginTop: "30px"}}>
                     <h2 style={{ textAlign: "center", marginBottom: "50px", color: whiteColor }}>Shopping Cart</h2>
                     {!cartData?.products ? <><h5 style={{color: whiteColor, textAlign: "center"}}>Your Cart is Empty!</h5></> : 
                     <>
-                        <TableContainer className="box-shadow">
-                            <Table sx={{ minWidth: 650, width: "100%", "th, td, input, label": {color: whiteColor} }} aria-label="simple table">
+                        <TableContainer sx={{py:5, px:2}} className="box-shadow">
+                            <Table sx={{ width: "100%", "th, td, input, label": {color: whiteColor} }} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
                                         <TableCell></TableCell>

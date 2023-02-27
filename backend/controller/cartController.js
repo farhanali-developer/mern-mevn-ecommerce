@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const Cart = require('../models/cart')
+const Users = require('../models/users')
 require("dotenv").config({ path: "../.env" });
 const secret = process.env.SECRET
 
@@ -18,8 +19,14 @@ const getCart = async (req, res) => {
 
 const postCart = async (req, res) => {
     const { userId, product, quantity, price, subTotal } = req.body;
-  
+    
+    const checkUser = await Users.findById(userId)
+    if(!checkUser){
+      res.status(404).json({message: "User not found."})
+    }
+
     try {
+      
       let cart = await Cart.findOne({ userId });
   
       if (cart) {
@@ -65,7 +72,7 @@ const postCart = async (req, res) => {
         const newCart = await Cart.create({
           userId,
           products: [{ product, quantity, price, subTotal }],
-          cartTotal: { quantity, subTotal }
+          cartTotal: { totalQuantity: quantity, total: subTotal }
         });
   
         return res.status(201).send(newCart);

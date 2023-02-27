@@ -51,8 +51,8 @@ const userData = async (req, res) => {
   
       const user = await Users.findOne({_id: claims._id})
   
-      // const {password, ...data} = await user.toJSON();
-      const data = await user.toJSON();
+      const {password, ...data} = await user.toJSON();
+      // const data = await user.toJSON();
   
       res.send(data)
     } catch (error) {
@@ -93,27 +93,49 @@ const userSignup = async (req, res) => {
 }
 
 const profileUpdate = async (req, res) => {
-    const checkUser = await Users.findOne({email: req.body.email})
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(req.body.password, salt)
-    const newUser = new Users({
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      email: req.body.email,
-      phone: req.body.phone,
-      password: hashedPassword,
-      address: req.body.address,
-      role: req.body.role
-    });
-  
+    const checkUser = await Users.findById(req.body._id)
     if(!checkUser){
-      const addUser = await newUser.save()
-      const {password, ...data} = await addUser.toJSON();
-      res.send(data)  
+      res.status(404).send({message: "User not found."})
+    }
+
+    if(req.body.password){
+      const salt = await bcrypt.genSalt(10)
+      const hashedPassword = await bcrypt.hash(req.body.password, salt)
+      const updateUser = await Users.findByIdAndUpdate(
+        req.body._id,
+        {
+          first_name: req.body.first_name,
+          last_name: req.body.last_name,
+          email: req.body.email,
+          phone: req.body.phone,
+          password: hashedPassword,
+          address: req.body.address,
+          role: req.body.role
+        },
+        {
+          new: true
+        }
+      )
+      res.json(updateUser)
     }
     else{
-      res.send("User Exists.");
+      const updateUser = await Users.findByIdAndUpdate(
+        req.body._id,
+        {
+          first_name: req.body.first_name,
+          last_name: req.body.last_name,
+          email: req.body.email,
+          phone: req.body.phone,
+          address: req.body.address
+        },
+        {
+          new: true
+        }
+      )
+      res.json(updateUser)
     }
+
+    
 }
 
 module.exports = { userLogin, userData, userLogout, userSignup, profileUpdate }

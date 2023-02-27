@@ -10,8 +10,8 @@ const whiteColor = colors.common.white;
 
 export default function Profile() {
 
-    const [ updateUser , setUpdateUser ] = useState({})
-    const { user, setUser } = useContext(userContext);
+  const { user, setUser } = useContext(userContext);
+  const [ updateUser , setUpdateUser ] = useState(user)
     const [showPassword, setShowPassword] = useState(false);
 
     // const navigate = useNavigate();
@@ -25,7 +25,7 @@ export default function Profile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await axios.put("/user", user, { withCredentials: true,
+        await axios.patch("/user", updateUser, { withCredentials: true,
         headers: 
           { 
             "Content-Type": "application/json",
@@ -39,6 +39,10 @@ export default function Profile() {
     const handleMouseDownPassword = (event) => {
       event.preventDefault();
     };
+
+    useEffect(() => {
+      setUpdateUser(user)
+    }, [user])
 
     
 
@@ -67,7 +71,7 @@ export default function Profile() {
                   label="First Name"
                   type="text"
                   name="first_name"
-                  value={user?.first_name || ""}
+                  value={updateUser?.first_name || ""}
                   onChange={handleChange}
                 />
               </FormControl>
@@ -81,7 +85,7 @@ export default function Profile() {
                   type="text"
                   fullWidth
                   name="last_name"
-                  value={user?.last_name || ""}
+                  value={updateUser?.last_name || ""}
                   onChange={handleChange}
                 />
               </FormControl>
@@ -95,7 +99,7 @@ export default function Profile() {
                   type="email"
                   fullWidth
                   name="email"
-                  value={user?.email || ""}
+                  value={updateUser?.email || ""}
                   onChange={handleChange}
                 />
               </FormControl>
@@ -109,7 +113,7 @@ export default function Profile() {
                 type="text"
                 fullWidth
                 name="phone"
-                value={user?.phone || ""}
+                value={updateUser?.phone || ""}
                 onChange={handleChange}
                 />
               </FormControl>
@@ -122,7 +126,7 @@ export default function Profile() {
                   label="Address"
                   type="textarea"
                   variant="outlined"
-                  value={user?.address || ""}
+                  value={updateUser?.address || ""}
                   onChange={handleChange}
                   required
                   multiline
