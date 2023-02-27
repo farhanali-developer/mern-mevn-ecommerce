@@ -64,6 +64,7 @@ export default {
             const payload = {
                 email: this.loginData.email,
                 password: this.loginData.password,
+                role: "admin"
             };
             await this.actionLoginApi(payload);
             if(this.getLoginApiStatus == "success"){

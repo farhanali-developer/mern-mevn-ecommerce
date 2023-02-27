@@ -3,8 +3,12 @@
         <div class="col-12 col-md-6">
             <form @submit.prevent="submit()" ref="signupForm">
                 <div class="mb-3">
-                    <label for="fullName" class="form-label">Full Name *</label>
-                    <input type="text" class="form-control" id="fullName" required v-model="registerData.full_name">
+                    <label for="fullName" class="form-label">First Name *</label>
+                    <input type="text" class="form-control" id="firstName" required v-model="registerData.first_name">
+                </div>
+                <div class="mb-3">
+                    <label for="fullName" class="form-label">Last Name *</label>
+                    <input type="text" class="form-control" id="lastName" required v-model="registerData.last_name">
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email address *</label>

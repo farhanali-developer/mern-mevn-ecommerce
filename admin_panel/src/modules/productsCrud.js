@@ -22,6 +22,7 @@ const getProducts = () => {
     full_name: '',
     email: '',
     password: '',
+    role: 'admin'
   })
 
   const userData = ref({
@@ -66,9 +67,11 @@ const getProducts = () => {
    const signup = async () => { 
 
     const data = {
-      full_name: registerData.value.full_name,
+      first_name: registerData.value.first_name,
+      last_name: registerData.value.last_name,
       email: registerData.value.email,
       password: registerData.value.password,
+      role: "admin"
     }
 
     await axios.post("/signup", data, {headers: { "Content-Type": "application/json" },})
