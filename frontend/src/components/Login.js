@@ -21,8 +21,7 @@ export default function Login() {
 
     const [loginInfo , setLoginInfo] = useState({
         email : "",
-        password : "",
-        role: "user"
+        password : ""
     })
     const [state, setState] = useState({
       open: false,
@@ -70,7 +69,7 @@ export default function Login() {
            }, 2000);
         }
         else{
-          setAlert("Incorrect Email or password.");
+          setAlert(res.data.message);
           setSeverity("error");
           setState({ open: true });
           setTransition(() => TransitionDown);

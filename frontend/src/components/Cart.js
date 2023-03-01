@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../context/cartContext';
 import { userContext } from '../context/userContext';
-import { Grid, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, TextField, colors, Container, Snackbar, IconButton, Slide, Alert as MuiAlert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ThemeProvider, createTheme } from '@mui/material'
+import { Grid, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, TextField, colors, Container, Snackbar, IconButton, Slide, Alert as MuiAlert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ThemeProvider, createTheme, Stack } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 
 const whiteColor = colors.common.white;
@@ -34,6 +34,8 @@ const Cart = () => {
     
     const { cartData, updateCart, removeFromCart } = useContext(CartContext);
     const { user } = useContext(userContext);
+    const [qty, setQty] = useState(0);
+    const [newCartData, setNewCartData] = useState([]);
     const [open, setOpen] = useState(false);
     const [state, setState] = useState({
         open: false,
@@ -93,6 +95,24 @@ const Cart = () => {
         setState({ ...state, open: false });
     };
 
+    function qtyIncrease(id, qty, price){
+        const newQty = qty+1;
+        qtyUpdate(id, newQty, price);
+    }
+    function qtyDecrease(id, qty, price){
+        const newQty = qty-1;
+        qtyUpdate(id, newQty, price);
+    }
+
+    useEffect(() => {
+        // setQty()
+        setNewCartData(cartData?.products)
+    }, [cartData])
+
+    // useEffect(() => {
+    //     console.log(newCartData)
+    // }, [])
+
 
   return (
     <Container>
@@ -115,7 +135,7 @@ const Cart = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                {cartData && cartData?.products?.map((item) => (
+                                {newCartData && newCartData?.map((item) => (
                                     <TableRow
                                     key={item?.product?._id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -123,10 +143,10 @@ const Cart = () => {
                                         <TableCell component="th" scope="row">
                                             <img src={`${item?.product?.thumbnail}`} style={{ height: "50px", width: "50px", objectFit: "cover" }} alt="" />
                                         </TableCell>
-                                        <TableCell align="center">{item?.product?.title}</TableCell>
+                                        <TableCell align="center"><Link style={{color: whiteColor}} to={`/product/${item?.product?._id}`}>{item?.product?.title}</Link></TableCell>
                                         <TableCell align="center">${item?.product?.price}</TableCell>
                                         <TableCell align="center">
-                                            <TextField
+                                            {/* <TextField
                                                 id="standard-number"
                                                 label="Quantity"
                                                 InputLabelProps={{
@@ -135,7 +155,25 @@ const Cart = () => {
                                                 variant="standard"
                                                 defaultValue={item?.quantity}
                                                 onChange={(e) => qtyChange(item?.product?._id, e.target.value, item?.product?.price)}
-                                            />
+                                            /> */}
+                                            <Stack spacing={2} direction="row" sx={{mb:5, ml:0}}>
+                                                <Button variant="contained" size="small" color="success" onClick={() => qtyDecrease(item?.product?._id, item?.quantity, item?.product?.price)}>-</Button>
+                                                <TextField 
+                                                    id="outlined-basic"
+                                                    label="Quantity"
+                                                    type="number"
+                                                    InputProps={{
+                                                        inputProps: { 
+                                                            max: 5, min: 1 
+                                                        }
+                                                    }}
+                                                    variant="outlined"
+                                                    sx={{ml:0, ".css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {WebkitTextFillColor: whiteColor}}}
+                                                    disabled
+                                                    value={item?.quantity}
+                                                />
+                                                <Button variant="contained" size="small" color="success" onClick={() => qtyIncrease(item?.product?._id, item?.quantity, item?.product?.price)}>+</Button>
+                                            </Stack>
                                             <Snackbar
                                                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
                                                 open={state.open}

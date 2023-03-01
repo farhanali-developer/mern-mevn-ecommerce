@@ -8,9 +8,10 @@ export const UserProvider = ({children}) => {
     const [user, setUser] = useState({});
 
     const logout = async () => {
-        await axios.post("/logout", { withCredentials: true,
+        const res = await axios.post("/logout", { withCredentials: true,
         credentials: "include"});
         setUser({})
+        return res.status
     }
 
     const isLoggedIn = () => {

@@ -10,13 +10,19 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import './interceptors/axios'
 import { UserProvider } from './context/userContext';
+import { CartProvider } from './context/cartContext';
+import { WishlistProvider } from './context/wishlistContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <UserProvider>
-        <App />
+        <CartProvider>
+          <WishlistProvider>
+            <App />
+          </WishlistProvider>
+        </CartProvider>
       </UserProvider>
     </BrowserRouter>
   </React.StrictMode>

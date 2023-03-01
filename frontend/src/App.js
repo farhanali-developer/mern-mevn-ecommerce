@@ -11,7 +11,7 @@ import AllProducts from './components/AllProducts';
 import Login from './components/Login';
 import Register from './components/Register';
 import Profile from './components/Profile';
-import { Provider } from './context/cartContext';
+import { CartProvider } from './context/cartContext';
 import { userContext } from './context/userContext';
 
 function App() {
@@ -38,7 +38,7 @@ function App() {
   }, []);
 
   return (
-    <Provider>
+    <>
       <Navbar />
       <Routes>
         <Route path="/" element={<AllProducts />} exact />
@@ -50,7 +50,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
       </Routes>
       {/* <Footer /> */}
-    </Provider>
+    </>
   );
 }
 

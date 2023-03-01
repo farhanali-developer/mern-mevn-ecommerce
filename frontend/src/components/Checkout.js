@@ -165,7 +165,7 @@ function QontoStepIcon(props) {
 
 export default function Checkout() {
   const { isLoggedIn, user } = useContext(userContext)
-  const { cartData } = useContext(CartContext)
+  const { cartData, fetchCart } = useContext(CartContext)
   const [activeStep, setActiveStep] = useState(0);
   const [skipped, setSkipped] = useState(new Set());
   const [check, setCheck] = useState(false);
@@ -302,6 +302,7 @@ export default function Checkout() {
     try {
         handleDialogClose()
         const res = await axios.post('/order', orderData);
+        fetchCart()
         if(res.status < 400){
           setAlert("Order Confirmed! Thank you for ordering with us.");
           setSeverity("success");

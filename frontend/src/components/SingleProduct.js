@@ -1,25 +1,39 @@
-import * as React from 'react';
-import { useEffect, useState, useContext } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useEffect, useState, useContext } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
-import { CartContext } from '../context/cartContext';
-import { userContext } from '../context/userContext';
-import { Container, Grid, Box, Stack, TextField, Button, colors, Alert, IconButton } from '@mui/material';
-// import { Favorite, FavoriteBorder } from '@mui/icons-material';
-import { FavoriteBorder, Close as CloseIcon } from '@mui/icons-material';
-// import CloseIcon from '@mui/icons-material/Close';
+import { CartContext } from '../context/cartContext'
+import { userContext } from '../context/userContext'
+import { WishlistContext } from '../context/wishlistContext'
+import { Container, Grid, Box, Stack, TextField, Button, colors, Alert, IconButton, Snackbar, Slide } from '@mui/material'
+import { Favorite, FavoriteBorder, Close as CloseIcon } from '@mui/icons-material'
 
 const whiteColor = colors.common.white;
+
+function TransitionDown(props) {
+    return <Slide {...props} direction="down" />;
+  }
 
 export default function SingleProduct() {
     const { id } = useParams()
     const productId = id;
+
+    const { user, isLoggedIn } = useContext(userContext)
+    const { addToCart } = useContext(CartContext)
+    const { addToWishlist, removeFromWishlist, wishlistData } = useContext(WishlistContext)
+
     const [Products, setProducts] = useState([])
     const [qty, setQty] = useState(0)
     const [open, setOpen] = useState(false);
+    const [wishlist, setWishlist] = useState(false);
+    const [state, setState] = useState({
+        open: false,
+        Transition: 'SlideTransition'
+      });
+      const [transition, setTransition] = useState(undefined);
+      const [severity, setSeverity] = useState();
+      const [alert, setAlert] = useState("");
 
-    const { user } = useContext(userContext)
-    const { addToCart } = useContext(CartContext)
+    
 
     const fetchData = async () => {
       try {
@@ -35,7 +49,19 @@ export default function SingleProduct() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [])
+
+    useEffect(() => {
+        const wishlistProducts = wishlistData?.products
+        wishlistProducts?.map((item) => {
+            if(item?.productId == productId){
+                setWishlist(true)
+            }
+            else{
+                setWishlist(false)
+            }
+        })
+    }, [wishlistData])
 
     
 
@@ -61,6 +87,7 @@ export default function SingleProduct() {
     function qtyIncrease(){
         setQty(qty+1)
     }
+
     function qtyDecrease(){
         setQty(qty-1)
     }
@@ -82,6 +109,35 @@ export default function SingleProduct() {
         )
     }
 
+    const handleWishlist = (userId, productId) => {
+        const addToWishlistData = {
+            "userId" : userId,
+            "products" : [{
+                "productId": productId
+            }]
+        }
+
+        if(wishlist == false){
+            addToWishlist(addToWishlistData)
+            setAlert("Product added to wishlist.");
+            setSeverity("success");
+            setState({ open: true });
+            setTransition(() => TransitionDown);
+        }
+        else{
+            removeFromWishlist(productId)
+            setAlert("Product removed from wishlist.");
+            setSeverity("success");
+            setState({ open: true });
+            setTransition(() => TransitionDown);
+        }
+
+    }
+
+    const handleClose = () => {
+        setState({ ...state, open: false });
+    };
+
   return (
     <Container maxWidth="xl">
         <Box sx={{ width: '100%', m: 2 }}>
@@ -102,7 +158,7 @@ export default function SingleProduct() {
                         <p><b>Category: </b>{Products?.category}</p>
                         <p><b>Brand: </b> {Products?.brand}</p>
                         <div style={{ fontWight: "bold", marginTop: "20px", marginBottom: "100px", textAlign: "left" }}>
-                            <s style={{ fontSize: "1.1rem", color: whiteColor }}>$12.00</s>
+                            <s style={{ fontSize: "1.1rem", color: whiteColor }}>${Products?.saleprice}</s>
                             <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#dc3545", marginLeft: "10px" }}>${Products?.price}</span>
                         </div>
                         <Stack spacing={2} direction="row" sx={{mb:5, ml:0}}>
@@ -124,13 +180,41 @@ export default function SingleProduct() {
                             <Button variant="contained" size="small" color="success" onClick={() => qtyIncrease()}>+</Button>
                         </Stack>
                         <Stack spacing={2} direction="row">
-                            <Link to="/wishlist" style={{textDecoration: "none"}}>
-                                <Button variant="outlined" size="large"><FavoriteBorder />Add to wishlist</Button>
-                            </Link>
-                                <Button variant="contained" size="large" color="success" onClick={() => addCart(Products?._id, qty, Products?.price)}>Add to cart</Button>
-                            <Link to="/cart" style={{textDecoration: "none"}}>
-                                {/* <Button variant="contained" size="large" color="success" onClick={() => cartFunction(Products?._id)}>Add to cart</Button> */}
-                            </Link>
+                            {isLoggedIn() ? 
+                            <>
+                            {wishlist ? <>
+                                <Button variant="outlined" size="large" onClick={e => handleWishlist(user?._id, productId)}><Favorite sx={{mr:1}} />Remove From wishlist</Button>
+                            </> : <>
+                                <Button variant="outlined" size="large" onClick={e => handleWishlist(user?._id, productId)}><FavoriteBorder sx={{mr:1}} />Add to wishlist</Button>
+                            </>}
+                                
+                            </> : 
+                            <></>}
+                            <Snackbar
+                                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                                open={state.open}
+                                onClose={handleClose}
+                                autoHideDuration={3000}
+                                TransitionComponent={transition}
+                                key={state.vertical + state.horizontal}
+                                action={
+                                    <React.Fragment>
+                                    <IconButton
+                                        aria-label="close"
+                                        color="inherit"
+                                        sx={{ p: 0.5 }}
+                                        onClick={handleClose}
+                                    >
+                                        <CloseIcon />
+                                    </IconButton>
+                                    </React.Fragment>
+                                }
+                            >
+                                <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
+                                    {alert}
+                                </Alert>
+                            </Snackbar>
+                            <Button variant="contained" size="large" color="success" onClick={() => addCart(Products?._id, qty, Products?.price)}>Add to cart</Button>
                         </Stack>
                     </div>
                 </Grid>

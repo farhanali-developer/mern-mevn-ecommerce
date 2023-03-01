@@ -5,7 +5,7 @@ import { userContext } from "./userContext";
 const CartContext = createContext({});
 
 // context provider
-const Provider = ({ children }) => {
+const CartProvider = ({ children }) => {
   const {user} = useContext(userContext)
   // const [state, dispatch] = useReducer(cartReducer, initialState);
 
@@ -14,11 +14,8 @@ const Provider = ({ children }) => {
 
   const fetchCart = async () => {
     try {
-      
       const res = await axios.get(`/cart`); // Api call to Fetch Cart
-      if(res.data) {
-        setCartData(res.data)
-      }
+      setCartData(res.data)
     } catch (error) {
       console.log(error)
     }
@@ -66,10 +63,10 @@ const Provider = ({ children }) => {
 
 
   return (
-    <CartContext.Provider value={{ addToCart, updateCart, removeFromCart, cartData }}>
+    <CartContext.Provider value={{ addToCart, updateCart, removeFromCart, cartData, fetchCart }}>
       {children}
     </CartContext.Provider>
   );
 }
 
-export { CartContext, Provider }; 
+export { CartContext, CartProvider }; 

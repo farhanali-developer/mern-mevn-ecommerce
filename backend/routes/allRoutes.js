@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const AllProducts = require('../models/allproducts')
 const { paginate } = require('../middleware/pagination')
-const { userLogin, userData, userLogout, userSignup, profileUpdate, guestUser } = require('../controller/userController');
+const { userLogin, userData, userLogout, userSignup, profileUpdate } = require('../controller/userController');
 const { getAllProducts, addProduct, csvImport, getProductById, deleteById, deleteAllProducts, updateById } = require('../controller/productController');
 const { getCart, postCart, deleteCart, deleteAll } = require('../controller/cartController');
 const { orderData } = require('../controller/orderController')
+const { getWishlist, addToWishlist, deleteWishlist } = require('../controller/wishlistController')
 
 // User routes
 router.route('/user').get(userData).patch(profileUpdate)
@@ -26,6 +27,10 @@ router.route('/update/:id').put(updateById)
 router.route('/cart').get(getCart).post(postCart).put(postCart)
 router.route('/delete_cart_item/:userId/:productId').delete(deleteCart)
 router.route('/deleteAll').delete(deleteAll)
+
+// Wishlist Routes
+router.route('/wishlist').get(getWishlist).post(addToWishlist)
+router.route('/delete_wishlist_item/:userId/:productId').delete(deleteWishlist)
 
 //Order Routes
 router.route('/order').post(orderData)

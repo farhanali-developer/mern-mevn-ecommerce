@@ -18,19 +18,19 @@ const userLogin = async (req, res) => {
   const invalidCredetials = await bcrypt.compare(req.body.password, user.password)
   if(!invalidCredetials){
     return res.status(400).send({
-      message: "Invalid Credentials"
+      message: "Invalid Credentials!"
     })
   }
 
-  if(origin == "http://localhost:3000" && req.body.role !== "user"){
+  if(origin == "http://localhost:3000" && user.role !== "user"){
     return res.status(400).send({
-      message: "Not allowed to sign in."
+      message: "You are not a user."
     })
   }
 
-  if(origin == "http://localhost:5173" && req.body.role !== "admin"){
+  if(origin == "http://localhost:5173" && user.role !== "admin"){
     return res.status(400).send({
-      message: "Not allowed to sign in."
+      message: "You are not an admin."
     })
   }
 
@@ -105,6 +105,9 @@ const userData = async (req, res) => {
 const userLogout = async (req, res) => {
     res.clearCookie('jwt')
     res.sendStatus(204)
+    // res.status(204).send({
+    //   message: "Logged out!"
+    // })
 }
 
 const userSignup = async (req, res) => {
