@@ -12,6 +12,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Profile from './components/Profile';
 import Wishlist from './components/Wishlist';
+import OrderPage from './components/OrderPage';
+import AllOrders from './components/AllOrders';
 import { userContext } from './context/userContext';
 
 function App() {
@@ -49,6 +51,8 @@ function App() {
         <Route path="/signup" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
         <Route path= "/wishlist" element={<Wishlist />}/>
+        <Route path="/order/:id" element={<OrderPage />}/>
+        <Route path="/orders" element={<AllOrders />}/>
       </Routes>
       {/* <Footer /> */}
     </>

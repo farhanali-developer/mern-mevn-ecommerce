@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken')
 const Users = require('../models/users')
 require("dotenv").config({ path: "../.env" });
 const secret = process.env.SECRET
+const frontendUrl = process.env.FRONTEND_URL
+const adminPanelURL = process.env.ADMINPANEL_URL
 
 const userLogin = async (req, res) => {
   const origin = req.get('origin');
@@ -22,13 +24,13 @@ const userLogin = async (req, res) => {
     })
   }
 
-  if(origin == "http://localhost:3000" && user.role !== "user"){
+  if(origin == frontendUrl && user.role !== "user"){
     return res.status(400).send({
       message: "You are not a user."
     })
   }
 
-  if(origin == "http://localhost:5173" && user.role !== "admin"){
+  if(origin == adminPanelURL && user.role !== "admin"){
     return res.status(400).send({
       message: "You are not an admin."
     })

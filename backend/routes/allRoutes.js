@@ -5,7 +5,7 @@ const { paginate } = require('../middleware/pagination')
 const { userLogin, userData, userLogout, userSignup, profileUpdate } = require('../controller/userController');
 const { getAllProducts, addProduct, csvImport, getProductById, deleteById, deleteAllProducts, updateById } = require('../controller/productController');
 const { getCart, postCart, deleteCart, deleteAll } = require('../controller/cartController');
-const { orderData } = require('../controller/orderController')
+const { getOrderById, postOrderData } = require('../controller/orderController')
 const { getWishlist, addToWishlist, deleteWishlist } = require('../controller/wishlistController')
 
 // User routes
@@ -33,6 +33,7 @@ router.route('/wishlist').get(getWishlist).post(addToWishlist)
 router.route('/delete_wishlist_item/:userId/:productId').delete(deleteWishlist)
 
 //Order Routes
-router.route('/order').post(orderData)
+router.route('/order/:id').get(getOrderById)
+router.route('/order').post(postOrderData)
 
 module.exports = router

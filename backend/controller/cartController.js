@@ -12,9 +12,8 @@ const getCart = async (req, res) => {
     const cartData = await Cart.findOne({userId: decoded?._id}).populate("products.product")
     res.json(cartData)
   } catch (error) {
-    
-  }
-    
+      console.log(error) 
+  }  
 }
 
 const postCart = async (req, res) => {

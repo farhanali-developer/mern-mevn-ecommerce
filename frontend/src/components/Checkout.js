@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { userContext } from '../context/userContext';
@@ -193,8 +192,9 @@ export default function Checkout() {
     Transition: 'SlideTransition'
   });
 
-  const [transition, setTransition] = useState(undefined);
+  const [transition, setTransition] = useState(undefined)
   const [alert, setAlert] = useState("")
+  const [orderNumber, setOrderNumber] = useState(0)
 
   const navigate = useNavigate();
 
@@ -302,13 +302,14 @@ export default function Checkout() {
     try {
         handleDialogClose()
         const res = await axios.post('/order', orderData);
+        const orderId = res.data.orderId
         fetchCart()
         if(res.status < 400){
           setAlert("Order Confirmed! Thank you for ordering with us.");
           setSeverity("success");
           openSnackBar()
           setTimeout(()=> {
-            navigate("/");
+            navigate(`/order/${orderId}`);
            }, 3000);
         }
         else{

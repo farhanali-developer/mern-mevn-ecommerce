@@ -343,7 +343,7 @@ export default function Navbar() {
               >
                   MUI
               </Typography>
-              {/* <Search>
+              <Search>
                   <SearchIconWrapper>
                   <SearchIcon />
                   </SearchIconWrapper>
@@ -351,8 +351,8 @@ export default function Navbar() {
                   placeholder="Search…"
                   inputProps={{ 'aria-label': 'search' }}
                   />
-              </Search> */}
-              <Autocomplete
+              </Search>
+              {/* <Autocomplete
                 id="asynchronous-demo"
                 sx={{ width: 300, my:2, ml:2 }}
                 open={true}
@@ -381,7 +381,7 @@ export default function Navbar() {
                     }}
                   />
                 )}
-              />
+              /> */}
               <Box sx={{ flexGrow: 1 }} />
               <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                   <Link to="/cart" style={{ textDecoration: "none", color: "unset" }}>
