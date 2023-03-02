@@ -1,10 +1,11 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
+import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { CartContext } from '../context/cartContext';
 import { userContext } from '../context/userContext';
 import { WishlistContext } from '../context/wishlistContext';
-import { styled, alpha, AppBar, Box, Toolbar, IconButton, Typography, InputBase, Badge, Menu, MenuItem,  ThemeProvider, createTheme, Alert as MuiAlert, Slide, Snackbar } from '@mui/material';
+import { styled, alpha, AppBar, Box, Toolbar, IconButton, Typography, InputBase, Badge, Menu, MenuItem,  ThemeProvider, createTheme, Alert as MuiAlert, Slide, Snackbar, Autocomplete, CircularProgress, TextField } from '@mui/material';
 import { Menu as MenuIcon,  Search as SearchIcon, AccountCircle, Notifications as NotificationsIcon, More, ShoppingCart, Mail, Favorite, CloseOutlined as CloseIcon } from '@mui/icons-material';
 // import { Favorite, CloseOutlined as CloseIcon } from '@mui/icons-material';
 
@@ -16,6 +17,63 @@ const darkTheme = createTheme({
       },
     },
   });
+
+  function sleep(delay = 0) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, delay);
+    });
+  }
+
+  // Top films as rated by IMDb users. http://www.imdb.com/chart/top
+const topFilms = [
+  { title: 'The Shawshank Redemption', year: 1994 },
+  { title: 'The Godfather', year: 1972 },
+  { title: 'The Godfather: Part II', year: 1974 },
+  { title: 'The Dark Knight', year: 2008 },
+  { title: '12 Angry Men', year: 1957 },
+  { title: "Schindler's List", year: 1993 },
+  { title: 'Pulp Fiction', year: 1994 },
+  {
+    title: 'The Lord of the Rings: The Return of the King',
+    year: 2003,
+  },
+  { title: 'The Good, the Bad and the Ugly', year: 1966 },
+  { title: 'Fight Club', year: 1999 },
+  {
+    title: 'The Lord of the Rings: The Fellowship of the Ring',
+    year: 2001,
+  },
+  {
+    title: 'Star Wars: Episode V - The Empire Strikes Back',
+    year: 1980,
+  },
+  { title: 'Forrest Gump', year: 1994 },
+  { title: 'Inception', year: 2010 },
+  {
+    title: 'The Lord of the Rings: The Two Towers',
+    year: 2002,
+  },
+  { title: "One Flew Over the Cuckoo's Nest", year: 1975 },
+  { title: 'Goodfellas', year: 1990 },
+  { title: 'The Matrix', year: 1999 },
+  { title: 'Seven Samurai', year: 1954 },
+  {
+    title: 'Star Wars: Episode IV - A New Hope',
+    year: 1977,
+  },
+  { title: 'City of God', year: 2002 },
+  { title: 'Se7en', year: 1995 },
+  { title: 'The Silence of the Lambs', year: 1991 },
+  { title: "It's a Wonderful Life", year: 1946 },
+  { title: 'Life Is Beautiful', year: 1997 },
+  { title: 'The Usual Suspects', year: 1995 },
+  { title: 'Léon: The Professional', year: 1994 },
+  { title: 'Spirited Away', year: 2001 },
+  { title: 'Saving Private Ryan', year: 1998 },
+  { title: 'Once Upon a Time in the West', year: 1968 },
+  { title: 'American History X', year: 1998 },
+  { title: 'Interstellar', year: 2014 },
+];
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -66,8 +124,8 @@ function TransitionDown(props) {
 }
 
 export default function Navbar() {
-  const [anchorEl, setAnchorEl] = React.useState('');
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState('');
+  const [anchorEl, setAnchorEl] = useState('');
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState('');
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -83,6 +141,46 @@ export default function Navbar() {
   if(wishlistData?.products){
     wishlistCount = wishlistData?.products.length
   }
+
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState([]);
+  const [ products, setProducts ] = useState([])
+  const loading = open && options.length === 0;
+
+  useEffect(() => {
+    let active = true;
+
+    if (!loading) {
+      return undefined;
+    }
+
+    (async () => {
+      await sleep(1e3); // For demo purposes.
+
+      if (active) {
+        setOptions([...topFilms]);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [loading]);
+
+  useEffect(() => {
+    if (!open) {
+      setOptions([]);
+    }
+  }, [open]);
+
+  const fetchProducts = async () => {
+    const res = await axios.get('/')
+    setProducts(res.data.results)
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
 
 
 
@@ -245,7 +343,7 @@ export default function Navbar() {
               >
                   MUI
               </Typography>
-              <Search>
+              {/* <Search>
                   <SearchIconWrapper>
                   <SearchIcon />
                   </SearchIconWrapper>
@@ -253,7 +351,37 @@ export default function Navbar() {
                   placeholder="Search…"
                   inputProps={{ 'aria-label': 'search' }}
                   />
-              </Search>
+              </Search> */}
+              <Autocomplete
+                id="asynchronous-demo"
+                sx={{ width: 300, my:2, ml:2 }}
+                open={true}
+                onOpen={() => {
+                  setOpen(true);
+                }}
+                onClose={() => {
+                  setOpen(false);
+                }}
+                isOptionEqualToValue={(option, value) => option.title === value.title}
+                getOptionLabel={(option) => option.title}
+                options={products}
+                loading={loading}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Search"
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <React.Fragment>
+                          {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                          {params.InputProps.endAdornment}
+                        </React.Fragment>
+                      ),
+                    }}
+                  />
+                )}
+              />
               <Box sx={{ flexGrow: 1 }} />
               <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                   <Link to="/cart" style={{ textDecoration: "none", color: "unset" }}>
@@ -264,7 +392,7 @@ export default function Navbar() {
                     </IconButton>
                   
                   </Link>
-                  <Link to="/cart" style={{ textDecoration: "none", color: "unset" }}>
+                  <Link to="/wishlist" style={{ textDecoration: "none", color: "unset" }}>
                     <IconButton size="large" aria-label="show 4 new mails" color="inherit">
                       <Badge badgeContent={wishlistCount} color="error">
                           <Favorite />

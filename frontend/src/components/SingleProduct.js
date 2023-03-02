@@ -11,7 +11,7 @@ const whiteColor = colors.common.white;
 
 function TransitionDown(props) {
     return <Slide {...props} direction="down" />;
-  }
+}
 
 export default function SingleProduct() {
     const { id } = useParams()
@@ -29,9 +29,9 @@ export default function SingleProduct() {
         open: false,
         Transition: 'SlideTransition'
       });
-      const [transition, setTransition] = useState(undefined);
-      const [severity, setSeverity] = useState();
-      const [alert, setAlert] = useState("");
+    const [transition, setTransition] = useState(undefined);
+    const [severity, setSeverity] = useState();
+    const [alert, setAlert] = useState("");
 
     
 

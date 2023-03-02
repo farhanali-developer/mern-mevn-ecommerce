@@ -11,7 +11,7 @@ import AllProducts from './components/AllProducts';
 import Login from './components/Login';
 import Register from './components/Register';
 import Profile from './components/Profile';
-import { CartProvider } from './context/cartContext';
+import Wishlist from './components/Wishlist';
 import { userContext } from './context/userContext';
 
 function App() {
@@ -48,6 +48,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path= "/wishlist" element={<Wishlist />}/>
       </Routes>
       {/* <Footer /> */}
     </>
