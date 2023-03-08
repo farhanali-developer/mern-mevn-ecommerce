@@ -24,62 +24,10 @@ const getOrderById = async (req, res) => {
 }
 
 const postOrderData = async (req, res) => {
-    // console.log(req.body)
-    // products: [
-    //     {
-    //       attributes: [Object],
-    //       product: [Object],
-    //       quantity: 2,
-    //       price: 20,
-    //       subTotal: 40,
-    //       _id: '64062a4da8aae8e7eea06cd2'
-    //     }
-    //   ],
-
-
 
     if(req.body.paymentMethod == "card"){
-
-        const line_item = []
-        // const productData = {
-        //     price_data: {
-        //         currency : "",
-        //         product_data : {
-        //             name: ""
-        //         },
-        //         unit_amount: ""
-        //     },
-        //     quantity: ''
-        // }
         const email = req.body.customerInfo.email
-        const products = req.body.products
-        await products.map((product) => {
-            return {
-                price_data: {
-                    currency : "usd",
-                    product_data : {
-                        name: product?.product?.title
-                    },
-                    unit_amount: product?.price
-                },
-                quantity: product?.quantity
-            }
-        })
-    
-
         const session = await stripe.checkout.sessions.create({
-            // line_items: [
-            //   {
-            //     price_data: {
-            //       currency: 'usd',
-            //       product_data: {
-            //         name: 'T-shirt',
-            //       },
-            //       unit_amount: 2000,
-            //     },
-            //     quantity: 1,
-            //   },
-            // ],
             customer_email: email,
             line_items: req.body.products.map((product) => {
                 return {
@@ -97,7 +45,7 @@ const postOrderData = async (req, res) => {
               }),
             mode: 'payment',
             success_url: 'http://localhost:4242/success',
-            cancel_url: 'http://localhost:4242/cancel',
+            cancel_url: 'http://localhost:3000/checkout',
           });
 
         //   res.redirect(303, session.url);

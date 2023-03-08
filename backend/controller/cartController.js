@@ -25,8 +25,6 @@ const postCart = async (req, res) => {
     const price = req?.body?.price
     const subTotal = req?.body?.subTotal
     const attributes = req?.body?.attributes
-
-    console.log(req.body)
     
     const checkUser = await Users.findById(userId)
     if(!checkUser){
