@@ -9,9 +9,9 @@ const getWishlist = async (req, res) => {
   try {
     const userToken = req.cookies['jwt']
     const decoded = jwt.verify(userToken, secret)
-    // const wishlistData = await Wishlist.findOne({userId: decoded?._id}).populate("products.productId")
-    const wishlistData = await Wishlist.findOne({userId: decoded?._id})
-    res.json(wishlistData)
+    const wishlistData = await Wishlist.findOne({userId: decoded?._id}).populate("products.productId")
+    // const wishlistData = await Wishlist.findOne({userId: decoded?._id})
+    res.send(wishlistData)
   } catch (error) {
         console.log(error) 
   }

@@ -7,7 +7,12 @@ const AllProductsSchema = new mongoose.Schema({
   quantity: Number,
   brand: String,
   category: String,
-  sale: String
+  sold: Number,
+  quantity: String,
+  attributes: {
+    color: [],
+    size: []
+  },
 },  { timestamps: true })
 
 module.exports = mongoose.model('products', AllProductsSchema)

@@ -24,7 +24,6 @@ const WishlistProvider = ({ children }) => {
   const addToWishlist = async (item) => {
     try {
       const res = await axios.post('/wishlist', item); // Api call to add to wishlist
-      console.log(res)
       if(res.data) {
         await fetchWishlist();
       }

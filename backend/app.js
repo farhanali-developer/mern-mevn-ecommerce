@@ -14,8 +14,6 @@ const app = express()
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Credentials', true);
   res.header("Access-Control-Allow-Origin", "*");
-  // res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE"); // If using .fetch and not axios
-  // res.header("Access-Control-Allow-Headers", "auth-token, Origin, X-Requested-With, Content-Type, Accept");
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.header("Access-Control-Allow-Headers", "x-access-token, Origin, X-Requested-With, Content-Type, Accept");
   next();
@@ -37,8 +35,11 @@ app.use(express.json())
 app.use(cors({
   credentials: true,
   exposedHeaders: ["set-cookie"],
-  origin: ['http://localhost:5173', 'http://localhost:3000']
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'https://checkout.stripe.com/c/pay/cs_test_a1dVQGdzcHyDeNYstlPgCrI3IOozPBJMIonsMS2M2zNRhBDBF8gX29ziKp'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }))
+
 
 app.use(cookieParser())
 

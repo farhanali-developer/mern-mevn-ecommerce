@@ -13,7 +13,11 @@ const CartSchema = new mongoose.Schema(
           },
           quantity: Number,
           price: Number,
-          subTotal: Number
+          subTotal: Number,
+          attributes: {
+            color: String,
+            size: String
+          },
         }
       ],
       cartTotal: {

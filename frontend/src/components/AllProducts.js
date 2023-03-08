@@ -2,16 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios'
-import { Container, Grid, Box, TablePagination, ThemeProvider, createTheme } from '@mui/material'
-
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#1976d2',
-    },
-  },
-});
+import { Container, Grid, Box, TablePagination } from '@mui/material'
 
 const gridContainer = {
   height: "400px",
@@ -57,8 +48,7 @@ export default function AllProducts() {
     };
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <Container maxWidth="xl">
+    <Container maxWidth="xl">
         <Box sx={{ width: '100%', mt: 5 }}>
             <TablePagination
                 style={{ background: "lightseagreen"}}
@@ -92,6 +82,5 @@ export default function AllProducts() {
           </Grid>
         </Box>
       </Container>
-    </ThemeProvider>
   );
 }

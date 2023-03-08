@@ -12,7 +12,7 @@ export default function Profile() {
 
   const { user, setUser } = useContext(userContext);
   const [ updateUser , setUpdateUser ] = useState(user)
-    const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
     // const navigate = useNavigate();
 

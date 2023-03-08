@@ -20,6 +20,10 @@ const OrdersSchema = new mongoose.Schema(
                     type: mongoose.Schema.Types.ObjectId,
                     ref: "products"
                 },
+                attributes: {
+                    color: [],
+                    size: []
+                },
                 quantity: Number,
                 price: Number,
                 subTotal: Number

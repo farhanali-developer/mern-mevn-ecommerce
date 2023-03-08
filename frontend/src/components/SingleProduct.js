@@ -4,7 +4,7 @@ import axios from 'axios'
 import { CartContext } from '../context/cartContext'
 import { userContext } from '../context/userContext'
 import { WishlistContext } from '../context/wishlistContext'
-import { Container, Grid, Box, Stack, TextField, Button, colors, Alert, IconButton, Snackbar, Slide } from '@mui/material'
+import { Container, Grid, Box, Stack, TextField, Button, colors, Alert, IconButton, Snackbar, Slide, MenuItem } from '@mui/material'
 import { Favorite, FavoriteBorder, Close as CloseIcon } from '@mui/icons-material'
 
 const whiteColor = colors.common.white;
@@ -23,6 +23,8 @@ export default function SingleProduct() {
 
     const [Products, setProducts] = useState([])
     const [qty, setQty] = useState(0)
+    const [color, setColor] = useState("")
+    const [size, setSize] = useState("")
     const [open, setOpen] = useState(false);
     const [wishlist, setWishlist] = useState(false);
     const [state, setState] = useState({
@@ -37,8 +39,7 @@ export default function SingleProduct() {
 
     const fetchData = async () => {
       try {
-            const url = `/product/${productId}`;
-            const res = await axios.get(url);
+            const res = await axios.get(`/product/${productId}`);
             if(res){
                 setProducts(res.data);
             }
@@ -52,9 +53,8 @@ export default function SingleProduct() {
     }, [])
 
     useEffect(() => {
-        const wishlistProducts = wishlistData?.products
-        wishlistProducts?.map((item) => {
-            if(item?.productId == productId){
+        wishlistData?.products?.map((product) => {
+            if(product?.productId?._id == productId){
                 setWishlist(true)
             }
             else{
@@ -77,6 +77,10 @@ export default function SingleProduct() {
             "quantity": qty,
             "price": price,
             "subTotal": subTotal,
+            "attributes": {
+                "color": color,
+                "size": size
+            }
         }
 
         if(addToCart(data)){
@@ -161,6 +165,46 @@ export default function SingleProduct() {
                             <s style={{ fontSize: "1.1rem", color: whiteColor }}>${Products?.saleprice}</s>
                             <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#dc3545", marginLeft: "10px" }}>${Products?.price}</span>
                         </div>
+
+                        <Stack spacing={2} direction="row" sx={{mb:5, ml:0}}>
+                            {Products?.attributes?.color ? <>
+                                <TextField
+                                id="filled-select-color"
+                                select
+                                label="Color"
+                                helperText="Please select a color"
+                                variant="filled"
+                                value={color}
+                                onChange={(e) => setColor(e.target.value)}
+                                >
+                                    {Products?.attributes?.color?.map((option, index) => (
+                                        <MenuItem key={index} value={option}>
+                                        {option}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            </> : <></>}
+                                
+
+                            {Products?.attributes?.size ? <>
+                                <TextField
+                                id="filled-select-size"
+                                select
+                                label="Size"
+                                helperText="Please select a size"
+                                variant="filled"
+                                value={size}
+                                onChange={(e) => setSize(e.target.value)}
+                                >
+                                    {Products?.attributes?.size?.map((option, index) => (
+                                        <MenuItem key={index} value={option}>
+                                        {option}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            </> : <></>}
+                        </Stack>
+
                         <Stack spacing={2} direction="row" sx={{mb:5, ml:0}}>
                             <Button variant="contained" size="small" color="success" onClick={() => qtyDecrease()}>-</Button>
                             <TextField 

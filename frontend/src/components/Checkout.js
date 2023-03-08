@@ -5,19 +5,10 @@ import { userContext } from '../context/userContext';
 import { CartContext } from '../context/cartContext';
 import PropTypes from 'prop-types';
 import { Check, Info, DeliveryDining, Paid } from '@mui/icons-material';
-import { Stepper, Step, StepLabel, Button, Typography, Grid, Box, Container, StepConnector, stepConnectorClasses, styled, FormGroup, FormControlLabel, Checkbox, TextField, RadioGroup, Radio, FormControl, colors, Stack, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ThemeProvider, createTheme, Slide, IconButton, Snackbar, Alert as MuiAlert } from '@mui/material'
+import { Stepper, Step, StepLabel, Button, Typography, Grid, Box, Container, StepConnector, stepConnectorClasses, styled, FormGroup, FormControlLabel, Checkbox, TextField, RadioGroup, Radio, FormControl, colors, Stack, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Slide, IconButton, Snackbar, Alert as MuiAlert } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 
 const whiteColor = colors.common.white;
-
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#1976d2',
-    },
-  },
-});
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -302,6 +293,7 @@ export default function Checkout() {
     try {
         handleDialogClose()
         const res = await axios.post('/order', orderData);
+        window.location.href = res.data.url
         const orderId = res.data.orderId
         fetchCart()
         if(res.status < 400){
@@ -309,7 +301,7 @@ export default function Checkout() {
           setSeverity("success");
           openSnackBar()
           setTimeout(()=> {
-            navigate(`/order/${orderId}`);
+            // navigate(`/order/${orderId}`);
            }, 3000);
         }
         else{
@@ -473,8 +465,7 @@ export default function Checkout() {
                     ) : (
                         <>
                           {stepData()}
-                          <ThemeProvider theme={darkTheme}>
-                            <Dialog
+                          <Dialog
                                 open={open}
                                 onClose={handleDialogClose}
                                 aria-labelledby="alert-dialog-title"
@@ -512,8 +503,7 @@ export default function Checkout() {
                                         Yes
                                     </Button>
                                 </DialogActions>
-                              </Dialog>
-                          </ThemeProvider>
+                            </Dialog>
                           <Snackbar
                               anchorOrigin={{ vertical: "top", horizontal: "right" }}
                               open={state.open}

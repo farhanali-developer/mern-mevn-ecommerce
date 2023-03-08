@@ -5,18 +5,9 @@ import { useContext, useState } from 'react';
 import { CartContext } from '../context/cartContext';
 import { userContext } from '../context/userContext';
 import { WishlistContext } from '../context/wishlistContext';
-import { styled, alpha, AppBar, Box, Toolbar, IconButton, Typography, InputBase, Badge, Menu, MenuItem,  ThemeProvider, createTheme, Alert as MuiAlert, Slide, Snackbar, Autocomplete, CircularProgress, TextField } from '@mui/material';
+import { styled, alpha, AppBar, Box, Toolbar, IconButton, Typography, InputBase, Badge, Menu, MenuItem, Alert as MuiAlert, Slide, Snackbar, Autocomplete, CircularProgress, TextField } from '@mui/material';
 import { Menu as MenuIcon,  Search as SearchIcon, AccountCircle, Notifications as NotificationsIcon, More, ShoppingCart, Mail, Favorite, CloseOutlined as CloseIcon } from '@mui/icons-material';
 // import { Favorite, CloseOutlined as CloseIcon } from '@mui/icons-material';
-
-const darkTheme = createTheme({
-    palette: {
-      mode: 'dark',
-      primary: {
-        main: '#1976d2',
-      },
-    },
-  });
 
   function sleep(delay = 0) {
     return new Promise((resolve) => {
@@ -138,9 +129,7 @@ export default function Navbar() {
     itemCount = cartData?.products.length
   }
 
-  if(wishlistData?.products){
-    wishlistCount = wishlistData?.products.length
-  }
+  wishlistCount = wishlistData?.products?.length
 
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
@@ -217,6 +206,7 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const logoutFunc = async (e) => {
+    handleMenuClose()
     const res = await logout()
     if(res == 204){
         setAlert("Logout Successful!");
@@ -233,6 +223,9 @@ export default function Navbar() {
     return isLoggedIn() && !isGuest() ? [
       <Link to="/profile" style={{ textDecoration: "none", color: "#000"}}>
         <MenuItem>Profile</MenuItem>
+      </Link>,
+      <Link to="/orders" style={{ textDecoration: "none", color: "#000"}}>
+        <MenuItem>My Orders</MenuItem>
       </Link>,
       <MenuItem onClick={logoutFunc}>Logout</MenuItem>
     ]: [
@@ -322,9 +315,8 @@ export default function Navbar() {
   );
 
   return (
-    <Box sx={{ flexGrow: 1 }} theme={darkTheme}>
-      <ThemeProvider theme={darkTheme}>
-        <AppBar position="static">
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
             <Toolbar>
               <IconButton
                   size="large"
@@ -459,7 +451,6 @@ export default function Navbar() {
             {alert}
           </Alert>
         </Snackbar>
-      </ThemeProvider>
       {renderMobileMenu}
       {renderMenu}
     </Box>

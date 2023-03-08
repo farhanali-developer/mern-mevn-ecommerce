@@ -17,7 +17,16 @@ const getCart = async (req, res) => {
 }
 
 const postCart = async (req, res) => {
-    const { userId, product, quantity, price, subTotal } = req.body;
+    // const { attributes } = req.body;
+
+    const userId = req?.body?.userId
+    const product = req?.body?.product
+    const quantity = req?.body?.quantity
+    const price = req?.body?.price
+    const subTotal = req?.body?.subTotal
+    const attributes = req?.body?.attributes
+
+    console.log(req.body)
     
     const checkUser = await Users.findById(userId)
     if(!checkUser){
@@ -41,6 +50,14 @@ const postCart = async (req, res) => {
           let productItem = cart.products[itemIndex];
           productItem.quantity = quantity;
           productItem.subTotal = subTotal;
+
+          if(attributes.color !== ""){
+            productItem.attributes.color = attributes.color;
+          }
+          if(attributes.size !== ""){
+            productItem.attributes.size = attributes.size;
+          }
+
           cart.products[itemIndex] = productItem;
 
           totalProducts.map((products) => {
@@ -53,7 +70,7 @@ const postCart = async (req, res) => {
 
         } else {
           //product does not exists in cart, add new item
-          cart.products.push({ product, quantity, price, subTotal });
+          cart.products.push({ product, quantity, price, subTotal, attributes });
 
           totalProducts.map((products) => {
             totalQuantity = +totalQuantity + +products?.quantity;
@@ -70,7 +87,7 @@ const postCart = async (req, res) => {
         //no cart for user, create new cart
         const newCart = await Cart.create({
           userId,
-          products: [{ product, quantity, price, subTotal }],
+          products: [{ product, quantity, price, subTotal, attributes }],
           cartTotal: { totalQuantity: quantity, total: subTotal }
         });
   

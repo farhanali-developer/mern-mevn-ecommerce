@@ -15,6 +15,13 @@ import Wishlist from './components/Wishlist';
 import OrderPage from './components/OrderPage';
 import AllOrders from './components/AllOrders';
 import { userContext } from './context/userContext';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 function App() {
 
@@ -40,7 +47,7 @@ function App() {
   }, []);
 
   return (
-    <>
+    <ThemeProvider theme={darkTheme}>
       <Navbar />
       <Routes>
         <Route path="/" element={<AllProducts />} exact />
@@ -55,7 +62,7 @@ function App() {
         <Route path="/orders" element={<AllOrders />}/>
       </Routes>
       {/* <Footer /> */}
-    </>
+    </ThemeProvider>
   );
 }
 
