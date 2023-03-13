@@ -4,15 +4,12 @@ const AllProductsSchema = new mongoose.Schema({
   description: String,
   thumbnail: String,
   price: Number,
-  quantity: Number,
+  stock: Number,
   brand: String,
   category: String,
   sold: Number,
-  quantity: String,
-  attributes: {
-    color: [],
-    size: []
-  },
+  attributes: Object,
+  canBeSubscribed: Boolean
 },  { timestamps: true })
 
 module.exports = mongoose.model('products', AllProductsSchema)

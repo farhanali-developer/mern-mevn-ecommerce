@@ -25,6 +25,7 @@ const postCart = async (req, res) => {
     const price = req?.body?.price
     const subTotal = req?.body?.subTotal
     const attributes = req?.body?.attributes
+    const canBeSubscribed = req?.body?.canBeSubscribed
     
     const checkUser = await Users.findById(userId)
     if(!checkUser){
@@ -48,6 +49,7 @@ const postCart = async (req, res) => {
           let productItem = cart.products[itemIndex];
           productItem.quantity = quantity;
           productItem.subTotal = subTotal;
+          productItem.canBeSubscribed = canBeSubscribed
 
           if(attributes.color !== ""){
             productItem.attributes.color = attributes.color;
@@ -85,7 +87,7 @@ const postCart = async (req, res) => {
         //no cart for user, create new cart
         const newCart = await Cart.create({
           userId,
-          products: [{ product, quantity, price, subTotal, attributes }],
+          products: [{ product, quantity, price, subTotal, attributes, canBeSubscribed }],
           cartTotal: { totalQuantity: quantity, total: subTotal }
         });
   

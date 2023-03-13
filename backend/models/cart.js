@@ -14,6 +14,7 @@ const CartSchema = new mongoose.Schema(
           quantity: Number,
           price: Number,
           subTotal: Number,
+          canBeSubscribed: Boolean,
           attributes: {
             color: String,
             size: String

@@ -21,6 +21,10 @@ const darkTheme = createTheme({
   palette: {
     mode: 'dark',
   },
+  text: {
+    primary: '#fff',
+    secondary: 'rgba(0,0,0,0.5)',
+  },
 });
 
 function App() {

@@ -7,6 +7,9 @@ import PropTypes from 'prop-types';
 import { Check, Info, DeliveryDining, Paid } from '@mui/icons-material';
 import { Stepper, Step, StepLabel, Button, Typography, Grid, Box, Container, StepConnector, stepConnectorClasses, styled, FormGroup, FormControlLabel, Checkbox, TextField, RadioGroup, Radio, FormControl, colors, Stack, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Slide, IconButton, Snackbar, Alert as MuiAlert } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from "@stripe/react-stripe-js";
+import CheckoutForm from "./CheckoutForm";
 
 const whiteColor = colors.common.white;
 
@@ -186,6 +189,9 @@ export default function Checkout() {
   const [transition, setTransition] = useState(undefined)
   const [alert, setAlert] = useState("")
   const [orderNumber, setOrderNumber] = useState(0)
+  const [paymentMethod, setPaymentMethod] = useState("cod")
+  const [stripePromise, setStripePromise] = useState()
+  const [clientSecret, setClientSecret] = useState()
 
   const navigate = useNavigate();
 
@@ -283,6 +289,7 @@ export default function Checkout() {
   }
 
   const payment = (e) => {
+    setPaymentMethod(e.target.value)
     setOrderData({
       ...orderData,
       paymentMethod: e.target.value
@@ -293,7 +300,6 @@ export default function Checkout() {
     try {
         handleDialogClose()
         const res = await axios.post('/order', orderData);
-        window.location.href = res.data.url
         const orderId = res.data.orderId
         fetchCart()
         if(res.status < 400){
@@ -301,7 +307,7 @@ export default function Checkout() {
           setSeverity("success");
           openSnackBar()
           setTimeout(()=> {
-            // navigate(`/order/${orderId}`);
+            navigate(`/order/${orderId}`);
            }, 3000);
         }
         else{
@@ -314,9 +320,21 @@ export default function Checkout() {
       }
   };
 
+  const getKey = async () => {
+    const res = await axios.get('/stripe_key')
+    setStripePromise(loadStripe(res.data.stripeKey))
+  }
+
+  const getSecretKey = async () => {
+    const res = await axios.post('/create-payment-intent', JSON.stringify({}))
+    setClientSecret(res.data.clientSecret)
+  }
+
   useEffect(() => {
       setUpdatedUserData(user)
-  }, [user, cartData]);
+      getKey()
+      getSecretKey()
+  }, [ user, cartData ]);
 
   const stepData = () => {
     return activeStep === 0 ? [
@@ -412,23 +430,44 @@ export default function Checkout() {
         </Box>
     ] : [
         <Box sx={{ maxWidth: "65%", mx: "auto", mt: 10 }}>
+          {paymentMethod == "cod" ? <>
             <FormControl>
                 <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
                     // defaultValue="cod"
                     name="radio-buttons-group"
                     onChange={payment}
+                    sx={{mb:5}}
                 >
                     <FormControlLabel value="cod" control={<Radio sx={{color: whiteColor}} />} label="Cash on Delivery" />
                     <FormControlLabel value="card" control={<Radio sx={{color: whiteColor}} />} label="Credit Card" />
                 </RadioGroup>
             </FormControl>
+          </> : <>
+          <FormControl>
+                <RadioGroup
+                    aria-labelledby="demo-radio-buttons-group-label"
+                    defaultValue="card"
+                    name="radio-buttons-group"
+                    onChange={payment}
+                    sx={{mb:5}}
+                >
+                    <FormControlLabel value="cod" control={<Radio sx={{color: whiteColor}} />} label="Cash on Delivery" />
+                    <FormControlLabel value="card" control={<Radio sx={{color: whiteColor}} />} label="Credit Card" />
+                </RadioGroup>
+            </FormControl>
+          {clientSecret && stripePromise && (
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <CheckoutForm />
+              </Elements>
+            )}
+          </>}
+           
+            
             <Stack spacing={2} direction="row" sx={{mt:10}}>
               <Button onClick={handleBack} variant="contained" style={{textAlign: "right", display: "inline-block", marginRight: "auto"}} size="large">Back</Button>
               <Button onClick={()=> handleDialogOpen()} variant="contained" style={{textAlign: "right", display: "inline-block", marginLeft: "auto"}} size="large">Confirm Order</Button>
             </Stack>
-
-
         </Box>
     ]
   }

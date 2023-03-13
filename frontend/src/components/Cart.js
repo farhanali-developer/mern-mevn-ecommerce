@@ -65,6 +65,7 @@ const Cart = () => {
             "product": id,
             "quantity": qty,
             "price": price,
+            "canBeSubscribed": false,
             "subTotal": subTotal,
             "attributes" : {
                 "color" : "",
@@ -143,7 +144,6 @@ const Cart = () => {
 
     useEffect(() => {
         setNewCartData(cartData?.products)
-        // console.log(cartData?.products)
     }, [cartData])
 
   return (
@@ -179,7 +179,8 @@ const Cart = () => {
                                     </TableCell>
                                     <TableCell align="center"><Link style={{color: whiteColor}} to={`/product/${item?.product?._id}`}>{item?.product?.title}</Link></TableCell>
                                     <TableCell align="center">
-                                        {item?.attributes?.color ? <>
+                                        {item?.attributes?.color}
+                                        {/* {item?.attributes?.color ? <>
                                             <TextField
                                             id="filled-select-color"
                                             select
@@ -195,10 +196,11 @@ const Cart = () => {
                                                     </MenuItem>
                                                 ))}
                                             </TextField>
-                                        </> : <></>}
+                                        </> : <></>} */}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {item?.attributes?.size ? <>
+                                        {item?.attributes?.size}
+                                        {/* {item?.attributes?.size ? <>
                                             <TextField
                                             id="filled-select-size"
                                             select
@@ -214,39 +216,27 @@ const Cart = () => {
                                                     </MenuItem>
                                                 ))}
                                             </TextField>
-                                        </> : <></>}
+                                        </> : <></>} */}
                                     </TableCell>
                                     <TableCell align="center">${item?.product?.price}</TableCell>
                                     <TableCell align="center">
-                                        <Stack spacing={0} direction="row" justifyContent="center" sx={{mb:5, ml:0}}>
-                                            <Button variant="contained" size="small" color="success" sx={{borderRadius: "0px"}} onClick={() => qtyDecrease(item?.product?._id, item?.quantity, item?.product?.price)}>-</Button>
-                                            {/* <TextField 
-                                                id="outlined-basic"
-                                                label="Quantity"
-                                                type="number"
-                                                InputProps={{
-                                                    inputProps: { 
-                                                        max: 5, min: 1 
-                                                    }
-                                                }}
-                                                variant="outlined"
-                                                sx={{ml:0, ".css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {WebkitTextFillColor: whiteColor}}}
-                                                disabled
-                                                value={item?.quantity}
-                                            /> */}
-                                            <OutlinedInput
-                                                id="outlined-adornment-weight"
-                                                // endAdornment={<InputAdornment position="end">kg</InputAdornment>}
-                                                aria-describedby="outlined-weight-helper-text"
-                                                inputProps={{
-                                                'aria-label': 'weight',
-                                                }}
-                                                disabled
-                                                sx={{p:0, width: "100px", borderRadius: "0px", "> #outlined-adornment-weight" : {textAlign: "center", WebkitTextFillColor: whiteColor}}}
-                                                value={item?.quantity}
-                                            />
-                                            <Button variant="contained" size="small" color="success" sx={{borderRadius: "0px"}} onClick={() => qtyIncrease(item?.product?._id, item?.quantity, item?.product?.price)}>+</Button>
-                                        </Stack>
+                                        {!item?.canBeSubscribed ? <>
+                                            <Stack spacing={0} direction="row" justifyContent="center" sx={{mb:5, ml:0}}>
+                                                <Button variant="contained" size="small" color="success" sx={{borderRadius: "0px"}} onClick={() => qtyDecrease(item?.product?._id, item?.quantity, item?.product?.price)}>-</Button>
+                                                <OutlinedInput
+                                                    id="outlined-adornment-weight"
+                                                    aria-describedby="outlined-weight-helper-text"
+                                                    inputProps={{
+                                                    'aria-label': 'weight',
+                                                    }}
+                                                    disabled
+                                                    sx={{p:0, width: "100px", borderRadius: "0px", "> #outlined-adornment-weight" : {textAlign: "center", WebkitTextFillColor: whiteColor}}}
+                                                    value={item?.quantity}
+                                                />
+                                                <Button variant="contained" size="small" color="success" sx={{borderRadius: "0px"}} onClick={() => qtyIncrease(item?.product?._id, item?.quantity, item?.product?.price)}>+</Button>
+                                            </Stack>
+                                        </> : <></>}
+
                                         <Snackbar
                                             anchorOrigin={{ vertical: "top", horizontal: "right" }}
                                             open={state.open}

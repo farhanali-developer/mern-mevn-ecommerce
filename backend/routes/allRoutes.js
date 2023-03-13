@@ -5,7 +5,7 @@ const { paginate } = require('../middleware/pagination')
 const { userLogin, userData, userLogout, userSignup, profileUpdate } = require('../controller/userController');
 const { getAllProducts, addProduct, csvImport, getProductById, deleteById, deleteAllProducts, updateById } = require('../controller/productController');
 const { getCart, postCart, deleteCart, deleteAll } = require('../controller/cartController');
-const { getOrders, getOrderById, postOrderData } = require('../controller/orderController')
+const { getOrders, getOrderById, postOrderData, stripeKey, paymentIntent } = require('../controller/orderController')
 const { getWishlist, addToWishlist, deleteWishlist } = require('../controller/wishlistController')
 
 // User routes
@@ -33,6 +33,8 @@ router.route('/wishlist').get(getWishlist).post(addToWishlist)
 router.route('/delete_wishlist_item/:userId/:productId').delete(deleteWishlist)
 
 //Order Routes
+router.route('/create-payment-intent').post(paymentIntent)
+router.route('/stripe_key').get(stripeKey)
 router.route('/order').get(getOrders).post(postOrderData)
 router.route('/order/:id').get(getOrderById)
 

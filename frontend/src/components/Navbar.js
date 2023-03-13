@@ -133,7 +133,7 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
-  const [ products, setProducts ] = useState([])
+  // const [ products, setProducts ] = useState([])
   const loading = open && options.length === 0;
 
   useEffect(() => {
@@ -162,14 +162,14 @@ export default function Navbar() {
     }
   }, [open]);
 
-  const fetchProducts = async () => {
-    const res = await axios.get('/')
-    setProducts(res.data.results)
-  }
+  // const fetchProducts = async () => {
+  //   const res = await axios.get('/')
+  //   setProducts(res.data.results)
+  // }
 
-  useEffect(() => {
-    fetchProducts()
-  }, [])
+  // useEffect(() => {
+  //   fetchProducts()
+  // }, [])
 
 
 

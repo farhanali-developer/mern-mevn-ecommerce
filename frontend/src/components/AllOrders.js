@@ -13,8 +13,6 @@ const AllOrders = () => {
   const fetchOrders = async () => {
     try {
       const res = await axios.get('/order');
-      console.log(res.data)
-      // const ordersArray = [res.data]; // wrap object inside an array
       setOrdersData(res.data);
       setOpenStates(new Array(res.data.length).fill(false));
     } catch (error) {

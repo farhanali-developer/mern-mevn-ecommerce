@@ -34,6 +34,7 @@ export default function SingleProduct() {
     const [transition, setTransition] = useState(undefined);
     const [severity, setSeverity] = useState();
     const [alert, setAlert] = useState("");
+    const [addIntoCart, setAddIntoCart] = useState()
 
     
 
@@ -77,6 +78,27 @@ export default function SingleProduct() {
             "quantity": qty,
             "price": price,
             "subTotal": subTotal,
+            "canBeSubscribed": false,
+            "attributes": {
+                "color": color,
+                "size": size
+            }
+        }
+
+        if(addToCart(data)){
+            setOpen(true);
+        }
+    }
+
+    const addVirtualProductToCart = (id, price) => {
+
+        const data = {
+            "userId": user?._id,
+            "product": id,
+            "quantity": "",
+            "price": price,
+            "subTotal": price,
+            "canBeSubscribed": true,
             "attributes": {
                 "color": color,
                 "size": size
@@ -166,63 +188,69 @@ export default function SingleProduct() {
                             <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#dc3545", marginLeft: "10px" }}>${Products?.price}</span>
                         </div>
 
-                        <Stack spacing={2} direction="row" sx={{mb:5, ml:0}}>
-                            {Products?.attributes?.color ? <>
-                                <TextField
-                                id="filled-select-color"
-                                select
-                                label="Color"
-                                helperText="Please select a color"
-                                variant="filled"
-                                value={color}
-                                onChange={(e) => setColor(e.target.value)}
-                                >
-                                    {Products?.attributes?.color?.map((option, index) => (
-                                        <MenuItem key={index} value={option}>
-                                        {option}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            </> : <></>}
-                                
+                        {Products?.attributes?.color.length > 0 || Products?.attributes?.size.length > 0 ? <>
+                            <Stack spacing={2} direction="row" sx={{mb:5, ml:0}}>
+                                {Products?.attributes?.color && Products?.attributes?.color.length > 0 ? <>
+                                    <TextField
+                                    id="filled-select-color"
+                                    select
+                                    label="Color"
+                                    helperText="Please select a color"
+                                    variant="filled"
+                                    value={color}
+                                    onChange={(e) => setColor(e.target.value)}
+                                    >
+                                        {Products?.attributes?.color?.map((option, index) => (
+                                            <MenuItem key={index} value={option}>
+                                            {option}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                </> : <></>}
+                                    
 
-                            {Products?.attributes?.size ? <>
-                                <TextField
-                                id="filled-select-size"
-                                select
-                                label="Size"
-                                helperText="Please select a size"
-                                variant="filled"
-                                value={size}
-                                onChange={(e) => setSize(e.target.value)}
-                                >
-                                    {Products?.attributes?.size?.map((option, index) => (
-                                        <MenuItem key={index} value={option}>
-                                        {option}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            </> : <></>}
-                        </Stack>
+                                {Products?.attributes?.size && Products?.attributes?.size.length > 0 ? <>
+                                    <TextField
+                                    id="filled-select-size"
+                                    select
+                                    label="Size"
+                                    helperText="Please select a size"
+                                    variant="filled"
+                                    value={size}
+                                    onChange={(e) => setSize(e.target.value)}
+                                    >
+                                        {Products?.attributes?.size?.map((option, index) => (
+                                            <MenuItem key={index} value={option}>
+                                            {option}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                </> : <></>}
+                            </Stack>
+                        </> : <></>}
 
-                        <Stack spacing={2} direction="row" sx={{mb:5, ml:0}}>
-                            <Button variant="contained" size="small" color="success" onClick={() => qtyDecrease()}>-</Button>
-                            <TextField 
-                                id="outlined-basic"
-                                label="Quantity"
-                                type="number"
-                                InputProps={{
-                                    inputProps: { 
-                                        max: 5, min: 1 
-                                    }
-                                }}
-                                variant="outlined"
-                                sx={{ml:0, ".css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {WebkitTextFillColor: whiteColor}}}
-                                disabled
-                                value={qty}
-                            />
-                            <Button variant="contained" size="small" color="success" onClick={() => qtyIncrease()}>+</Button>
-                        </Stack>
+                        
+                        {!Products?.canBeSubscribed ? <>
+                            <Stack spacing={2} direction="row" sx={{mb:5, ml:0}}>
+                                <Button variant="contained" size="small" color="success" onClick={() => qtyDecrease()}>-</Button>
+                                <TextField 
+                                    id="outlined-basic"
+                                    label="Quantity"
+                                    type="number"
+                                    InputProps={{
+                                        inputProps: { 
+                                            max: 5, min: 1 
+                                        }
+                                    }}
+                                    variant="outlined"
+                                    sx={{ml:0, ".css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input.Mui-disabled": {WebkitTextFillColor: whiteColor}}}
+                                    disabled
+                                    value={qty}
+                                />
+                                <Button variant="contained" size="small" color="success" onClick={() => qtyIncrease()}>+</Button>
+                            </Stack>
+                        </> : <></>}
+
                         <Stack spacing={2} direction="row">
                             {isLoggedIn() ? 
                             <>
@@ -258,7 +286,11 @@ export default function SingleProduct() {
                                     {alert}
                                 </Alert>
                             </Snackbar>
-                            <Button variant="contained" size="large" color="success" onClick={() => addCart(Products?._id, qty, Products?.price)}>Add to cart</Button>
+                            {!Products?.canBeSubscribed ? <>
+                                <Button variant="contained" size="large" color="success" onClick={() => addCart(Products?._id, qty, Products?.price)}>Add to cart</Button>
+                            </> : <>
+                                <Button variant="contained" size="large" color="success" onClick={() => addVirtualProductToCart(Products?._id, Products?.price)}>Add to cart</Button>
+                            </>}
                         </Stack>
                     </div>
                 </Grid>
