@@ -26,7 +26,8 @@ const OrdersSchema = new mongoose.Schema(
                 },
                 quantity: Number,
                 price: Number,
-                subTotal: Number
+                subTotal: Number,
+                canBeSubscribed: Boolean
             }
         ],
         cartTotal: {

@@ -4,7 +4,7 @@ import axios from 'axios'
 import { CartContext } from '../context/cartContext'
 import { userContext } from '../context/userContext'
 import { WishlistContext } from '../context/wishlistContext'
-import { Container, Grid, Box, Stack, TextField, Button, colors, Alert, IconButton, Snackbar, Slide, MenuItem } from '@mui/material'
+import { Container, Grid, Box, Stack, TextField, Button, colors, Alert, IconButton, Snackbar, Slide, MenuItem, Typography } from '@mui/material'
 import { Favorite, FavoriteBorder, Close as CloseIcon } from '@mui/icons-material'
 
 const whiteColor = colors.common.white;
@@ -22,7 +22,7 @@ export default function SingleProduct() {
     const { addToWishlist, removeFromWishlist, wishlistData } = useContext(WishlistContext)
 
     const [Products, setProducts] = useState([])
-    const [qty, setQty] = useState(0)
+    const [qty, setQty] = useState(1)
     const [color, setColor] = useState("")
     const [size, setSize] = useState("")
     const [open, setOpen] = useState(false);
@@ -110,12 +110,22 @@ export default function SingleProduct() {
         }
     }
 
-    function qtyIncrease(){
-        setQty(qty+1)
+    function qtyIncrease(max){
+        if(qty == max){
+            return
+        }
+        else{
+            setQty(qty+1)
+        }
     }
 
-    function qtyDecrease(){
-        setQty(qty-1)
+    function qtyDecrease(min){
+        if(qty <= min){
+            return
+        }
+        else{
+            setQty(qty-1)
+        }
     }
 
     const notification = () => {
@@ -186,6 +196,11 @@ export default function SingleProduct() {
                         <div style={{ fontWight: "bold", marginTop: "20px", marginBottom: "100px", textAlign: "left" }}>
                             <s style={{ fontSize: "1.1rem", color: whiteColor }}>${Products?.saleprice}</s>
                             <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#dc3545", marginLeft: "10px" }}>${Products?.price}</span>
+                            {Products?.stock <= 0 ? <>
+                                <Typography sx={{mt:5}}>Out of stock</Typography>
+                            </> : <>
+                                <Typography sx={{mt:5}}>In stock</Typography>
+                            </>}
                         </div>
 
                         {Products?.attributes?.color.length > 0 || Products?.attributes?.size.length > 0 ? <>
@@ -230,16 +245,17 @@ export default function SingleProduct() {
                         </> : <></>}
 
                         
-                        {!Products?.canBeSubscribed ? <>
+                        
+                        {!Products?.canBeSubscribed && Products?.stock >= 1 ? <>
                             <Stack spacing={2} direction="row" sx={{mb:5, ml:0}}>
-                                <Button variant="contained" size="small" color="success" onClick={() => qtyDecrease()}>-</Button>
+                                <Button variant="contained" size="small" color="success" onClick={() => qtyDecrease(1)}>-</Button>
                                 <TextField 
                                     id="outlined-basic"
                                     label="Quantity"
                                     type="number"
                                     InputProps={{
                                         inputProps: { 
-                                            max: 5, min: 1 
+                                            max: Products?.stock, min: 1 
                                         }
                                     }}
                                     variant="outlined"
@@ -247,7 +263,7 @@ export default function SingleProduct() {
                                     disabled
                                     value={qty}
                                 />
-                                <Button variant="contained" size="small" color="success" onClick={() => qtyIncrease()}>+</Button>
+                                <Button variant="contained" size="small" color="success" onClick={() => qtyIncrease(Products?.stock)}>+</Button>
                             </Stack>
                         </> : <></>}
 
@@ -286,11 +302,15 @@ export default function SingleProduct() {
                                     {alert}
                                 </Alert>
                             </Snackbar>
-                            {!Products?.canBeSubscribed ? <>
-                                <Button variant="contained" size="large" color="success" onClick={() => addCart(Products?._id, qty, Products?.price)}>Add to cart</Button>
-                            </> : <>
-                                <Button variant="contained" size="large" color="success" onClick={() => addVirtualProductToCart(Products?._id, Products?.price)}>Add to cart</Button>
-                            </>}
+
+                            {Products?.canBeSubscribed ? <>
+                                <Button variant="contained" size="large" color="success" onClick={() => addVirtualProductToCart(Products?._id, Products?.price)}>Add to cart</Button>                            
+                            </> : !Products.canBeSubscribed && Products?.stock >= 1 ? <>
+                                <Button variant="contained" size="large" color="success" onClick={() => addCart(Products?._id, qty, Products?.price)}>Add to cart</Button>                            
+                            </> : <></>}
+
+
+
                         </Stack>
                     </div>
                 </Grid>

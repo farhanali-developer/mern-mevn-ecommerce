@@ -16,6 +16,8 @@ import OrderPage from './components/OrderPage';
 import AllOrders from './components/AllOrders';
 import { userContext } from './context/userContext';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from "@stripe/react-stripe-js";
 
 const darkTheme = createTheme({
   palette: {
@@ -30,6 +32,8 @@ const darkTheme = createTheme({
 function App() {
 
   const { setUser } = useContext(userContext)
+  const [stripePromise, setStripePromise] = useState()
+  const [clientSecret, setClientSecret] = useState()
 
   const fetchData = async () => {
     try{
@@ -46,26 +50,42 @@ function App() {
     }
   }
 
+  const getKey = async () => {
+    const res = await axios.get('/stripe_key')
+    setStripePromise(loadStripe(res.data.stripeKey))
+  }
+
+  const getSecretKey = async () => {
+    const res = await axios.post('/create-payment-intent', JSON.stringify({}))
+    setClientSecret(res.data.clientSecret)
+  }
+
   useEffect(()=>{
     fetchData();
+    getKey()
+      getSecretKey()
   }, []);
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<AllProducts />} exact />
-        <Route path="/product/:id" element={<SingleProduct />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path= "/wishlist" element={<Wishlist />}/>
-        <Route path="/order/:id" element={<OrderPage />}/>
-        <Route path="/orders" element={<AllOrders />}/>
-      </Routes>
-      {/* <Footer /> */}
+      {clientSecret && stripePromise && (
+        <Elements stripe={stripePromise} options={{ clientSecret }}>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<AllProducts />} exact />
+            <Route path="/product/:id" element={<SingleProduct />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path= "/wishlist" element={<Wishlist />}/>
+            <Route path="/order/:id" element={<OrderPage />}/>
+            <Route path="/orders" element={<AllOrders />}/>
+          </Routes>
+          {/* <Footer /> */}
+        </Elements>
+      )}
     </ThemeProvider>
   );
 }

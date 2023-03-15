@@ -70,7 +70,7 @@ const postCart = async (req, res) => {
 
         } else {
           //product does not exists in cart, add new item
-          cart.products.push({ product, quantity, price, subTotal, attributes });
+          cart.products.push({ product, quantity, price, subTotal, attributes, canBeSubscribed });
 
           totalProducts.map((products) => {
             totalQuantity = +totalQuantity + +products?.quantity;

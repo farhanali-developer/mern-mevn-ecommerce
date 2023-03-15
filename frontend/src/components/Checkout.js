@@ -8,8 +8,30 @@ import { Check, Info, DeliveryDining, Paid } from '@mui/icons-material';
 import { Stepper, Step, StepLabel, Button, Typography, Grid, Box, Container, StepConnector, stepConnectorClasses, styled, FormGroup, FormControlLabel, Checkbox, TextField, RadioGroup, Radio, FormControl, colors, Stack, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Slide, IconButton, Snackbar, Alert as MuiAlert } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import { loadStripe } from '@stripe/stripe-js'
-import { Elements } from "@stripe/react-stripe-js";
+import { CardElement, Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./CheckoutForm";
+import { PaymentElement } from "@stripe/react-stripe-js";
+import { useStripe, useElements } from "@stripe/react-stripe-js";
+
+const CARD_OPTIONS = {
+	iconStyle: "solid",
+	style: {
+		base: {
+			iconColor: "#c4f0ff",
+			color: "#fff",
+			fontWeight: 500,
+			fontFamily: "Roboto, Open Sans, Segoe UI, sans-serif",
+			fontSize: "16px",
+			fontSmoothing: "antialiased",
+			":-webkit-autofill": { color: "#fce883" },
+			"::placeholder": { color: "#87bbfd" }
+		},
+		invalid: {
+			iconColor: "#ffc7ee",
+			color: "#ffc7ee"
+		}
+	}
+}
 
 const whiteColor = colors.common.white;
 
@@ -179,6 +201,7 @@ export default function Checkout() {
       cartTotal: {},
       deliveryMethod: '',
       paymentMethod: '',
+      paymentId: ''
     },
   );
   const [state, setState] = useState({
@@ -192,6 +215,11 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("cod")
   const [stripePromise, setStripePromise] = useState()
   const [clientSecret, setClientSecret] = useState()
+  const [message, setMessage] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const stripe = useStripe();
+  const elements = useElements();
 
   const navigate = useNavigate();
 
@@ -242,7 +270,8 @@ export default function Checkout() {
     checkbox ? setCheck(true) : setCheck(false);
   }
 
-  const handleDialogOpen = () => {
+  const handleDialogOpen = (e) => {
+    e.preventDefault();
     setOpen(true);
   };
 
@@ -299,7 +328,7 @@ export default function Checkout() {
   const finalOrder = async () => {
     try {
         handleDialogClose()
-        const res = await axios.post('/order', orderData);
+        const res = await axios.post('/order', {data: orderData});
         const orderId = res.data.orderId
         fetchCart()
         if(res.status < 400){
@@ -335,6 +364,98 @@ export default function Checkout() {
       getKey()
       getSecretKey()
   }, [ user, cartData ]);
+
+
+
+  const handleSubmit = async () => {
+
+    if (!stripe || !elements) {
+      // Stripe.js has not yet loaded.
+      // Make sure to disable form submission until Stripe.js has loaded.
+      return;
+    }
+
+    setIsProcessing(true);
+
+     // create a stripe subscription
+    //  const subscription = await this.stripe.subscriptions.create({
+    //   customer: userId,
+    //   items: cartItems,
+    //   payment_settings: {
+    //     payment_method_options: {
+    //       card: {
+    //         request_three_d_secure: 'any',
+    //       },
+    //     },
+    //     payment_method_types: ['card'],
+    //     save_default_payment_method: 'on_subscription',
+    //   },
+    //   expand: ['latest_invoice.payment_intent'],
+    // });
+
+    // console.log(subscription)
+
+    // const response = await stripe.confirmPayment({
+
+    //   elements,
+    //   confirmParams: {
+    //     // Make sure to change this to your payment completion page
+    //     // return_url: `${window.location.origin}/completion`,
+    //   },
+    //   redirect: 'if_required' 
+    // });
+
+    // if (response.error) {
+    //   setMessage(response.error.message);
+    // } else {
+    //   setMessage(`Payment Succeeded: ${response.paymentIntent.id}`);
+    //   finalOrder()
+    // }
+
+    const {error, paymentMethod} = await stripe.createPaymentMethod({
+      type: "card",
+      card: elements.getElement(CardElement)
+    })
+
+    
+
+    if(!error) {
+      try {
+        const {id} = paymentMethod
+          // const response = await axios.post("http://localhost:4000/payment", {
+          //     amount: 1000,
+          //     id
+          // })
+          handleDialogClose()
+          const res = await axios.post('/order', {data: orderData, paymentId: id});
+          const orderId = res.data.orderId
+          if(res.data.success){
+            setIsProcessing(false);
+            fetchCart()
+            setAlert("Order Confirmed! Thank you for ordering with us.");
+            setSeverity("success");
+            openSnackBar()
+            setTimeout(()=> {
+              navigate(`/order/${orderId}`);
+             }, 3000);
+          }
+          else{
+            setAlert("Sorry! An error occured.");
+            setSeverity("error");
+            openSnackBar()
+          }
+
+      } catch (error) {
+          console.log("Error", error)
+      }
+  } else {
+      console.log(error.message)
+  }
+
+
+    
+  };
+
 
   const stepData = () => {
     return activeStep === 0 ? [
@@ -417,6 +538,7 @@ export default function Checkout() {
                     // defaultValue="self"
                     name="radio-buttons-group"
                     onChange={delivery}
+                    required
                 >
                     <FormControlLabel value="self" control={<Radio sx={{color: whiteColor}} />} label="Self-pickup from the store" />
                     <FormControlLabel value="us" control={<Radio sx={{color: whiteColor}} />} label="US Shipping" />
@@ -438,6 +560,7 @@ export default function Checkout() {
                     name="radio-buttons-group"
                     onChange={payment}
                     sx={{mb:5}}
+                    required
                 >
                     <FormControlLabel value="cod" control={<Radio sx={{color: whiteColor}} />} label="Cash on Delivery" />
                     <FormControlLabel value="card" control={<Radio sx={{color: whiteColor}} />} label="Credit Card" />
@@ -451,22 +574,35 @@ export default function Checkout() {
                     name="radio-buttons-group"
                     onChange={payment}
                     sx={{mb:5}}
+                    required
                 >
                     <FormControlLabel value="cod" control={<Radio sx={{color: whiteColor}} />} label="Cash on Delivery" />
                     <FormControlLabel value="card" control={<Radio sx={{color: whiteColor}} />} label="Credit Card" />
                 </RadioGroup>
             </FormControl>
-          {clientSecret && stripePromise && (
+          {/* {clientSecret && stripePromise && (
               <Elements stripe={stripePromise} options={{ clientSecret }}>
                 <CheckoutForm />
               </Elements>
-            )}
+            )} */}
+
+          <form id="payment-form" className="box-shadow" style={{padding: "50px"}}>
+            {/* <PaymentElement id="payment-element" /> */}
+            <CardElement options={CARD_OPTIONS}/>
+            <Button type="submit" disabled={isProcessing || !stripe || !elements} id="submit" variant="contained" sx={{mt:5}} size="large" onClick={(e)=> handleDialogOpen(e)}>
+              <span id="button-text">
+                {isProcessing ? "Processing ... " : "Pay now and confirm order"}
+              </span>
+            </Button>
+          </form>
           </>}
            
             
             <Stack spacing={2} direction="row" sx={{mt:10}}>
               <Button onClick={handleBack} variant="contained" style={{textAlign: "right", display: "inline-block", marginRight: "auto"}} size="large">Back</Button>
-              <Button onClick={()=> handleDialogOpen()} variant="contained" style={{textAlign: "right", display: "inline-block", marginLeft: "auto"}} size="large">Confirm Order</Button>
+              {orderData?.paymentMethod == "cod" ? <>
+                <Button onClick={(e)=> handleDialogOpen(e)} variant="contained" style={{textAlign: "right", display: "inline-block", marginLeft: "auto"}} size="large">Confirm Order</Button>
+              </>: <></>}
             </Stack>
         </Box>
     ]
@@ -538,9 +674,15 @@ export default function Checkout() {
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={() => {handleDialogClose()}}>No</Button>
+                                    {orderData?.paymentMethod == "card" ? <>
+                                    <Button onClick={() => {handleSubmit()}} autoFocus>
+                                        Yes
+                                    </Button>
+                                    </> : orderData?.paymentMethod == "cod" ? <>
                                     <Button onClick={() => {finalOrder()}} autoFocus>
                                         Yes
                                     </Button>
+                                    </> : <></>}
                                 </DialogActions>
                             </Dialog>
                           <Snackbar

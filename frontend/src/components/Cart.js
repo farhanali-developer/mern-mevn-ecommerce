@@ -158,7 +158,7 @@ const Cart = () => {
                             <TableHead>
                                 <TableRow>
                                     <TableCell></TableCell>
-                                    <TableCell></TableCell>
+                                    <TableCell>Product Title</TableCell>
                                     <TableCell align="center">Color</TableCell>
                                     <TableCell align="center">Size</TableCell>
                                     <TableCell align="center">Price</TableCell>
@@ -177,7 +177,7 @@ const Cart = () => {
                                     <TableCell component="th" scope="row">
                                         <img src={`${item?.product?.thumbnail}`} style={{ height: "50px", width: "50px", objectFit: "cover" }} alt="" />
                                     </TableCell>
-                                    <TableCell align="center"><Link style={{color: whiteColor}} to={`/product/${item?.product?._id}`}>{item?.product?.title}</Link></TableCell>
+                                    <TableCell align="left"><Link style={{color: whiteColor}} to={`/product/${item?.product?._id}`}>{item?.product?.title}</Link></TableCell>
                                     <TableCell align="center">
                                         {item?.attributes?.color}
                                         {/* {item?.attributes?.color ? <>
