@@ -59,18 +59,21 @@ const userData = async (req, res) => {
     let claims;
 
     // Check if JWT token exists in cookies
-    if(cookie){
+    if(cookie && cookie !== null){
       // If token exists, verify it
       claims = jwt.verify(cookie, secret);
     } 
     else {
       // If token doesn't exist, create a new guest user
-      let guestUser = await Users.findOne({isGuest: true});
+      // let guestUser = await Users.findOne({isGuest: true});
 
-      if (!guestUser) {
-        const newUser = new Users({isGuest: true});
-        guestUser = await newUser.save();
-      }
+      // if (!guestUser) {
+      //   const newUser = new Users({isGuest: true});
+      //   guestUser = await newUser.save();
+      // }
+
+      const newUser = new Users({isGuest: true});
+      guestUser = await newUser.save();
       
       claims = {_id: guestUser?._id};
 

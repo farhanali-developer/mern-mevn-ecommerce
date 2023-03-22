@@ -18,7 +18,7 @@ export default function SingleProduct() {
     const productId = id;
 
     const { user, isLoggedIn } = useContext(userContext)
-    const { addToCart } = useContext(CartContext)
+    const { addToCart, addVirtualProductToCart } = useContext(CartContext)
     const { addToWishlist, removeFromWishlist, wishlistData } = useContext(WishlistContext)
 
     const [Products, setProducts] = useState([])
@@ -90,7 +90,7 @@ export default function SingleProduct() {
         }
     }
 
-    const addVirtualProductToCart = (id, price) => {
+    const addToCartVirtualProduct = (id, price) => {
 
         const data = {
             "userId": user?._id,
@@ -105,7 +105,7 @@ export default function SingleProduct() {
             }
         }
 
-        if(addToCart(data)){
+        if(addVirtualProductToCart(data)){
             setOpen(true);
         }
     }
@@ -194,13 +194,18 @@ export default function SingleProduct() {
                         <p><b>Category: </b>{Products?.category}</p>
                         <p><b>Brand: </b> {Products?.brand}</p>
                         <div style={{ fontWight: "bold", marginTop: "20px", marginBottom: "100px", textAlign: "left" }}>
-                            <s style={{ fontSize: "1.1rem", color: whiteColor }}>${Products?.saleprice}</s>
-                            <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#dc3545", marginLeft: "10px" }}>${Products?.price}</span>
-                            {Products?.stock <= 0 ? <>
+                            {Products?.salePrice ? <>
+                                <s style={{ fontSize: "1.1rem", color: whiteColor }}>${Products?.price}</s>
+                                <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#dc3545", marginLeft: "10px" }}>${Products?.salePrice}</span>
+                            </> : <>
+                                <span style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#dc3545", marginLeft: "10px" }}>${Products?.price}</span>
+                            </>}
+                            
+                            {/* {Products?.stock <= 0 ? <>
                                 <Typography sx={{mt:5}}>Out of stock</Typography>
                             </> : <>
                                 <Typography sx={{mt:5}}>In stock</Typography>
-                            </>}
+                            </>} */}
                         </div>
 
                         {Products?.attributes?.color.length > 0 || Products?.attributes?.size.length > 0 ? <>
@@ -304,9 +309,13 @@ export default function SingleProduct() {
                             </Snackbar>
 
                             {Products?.canBeSubscribed ? <>
-                                <Button variant="contained" size="large" color="success" onClick={() => addVirtualProductToCart(Products?._id, Products?.price)}>Add to cart</Button>                            
+                                <Button variant="contained" size="large" color="success" onClick={() => addToCartVirtualProduct(Products?._id, Products?.price)}>Add to cart</Button>                            
                             </> : !Products.canBeSubscribed && Products?.stock >= 1 ? <>
-                                <Button variant="contained" size="large" color="success" onClick={() => addCart(Products?._id, qty, Products?.price)}>Add to cart</Button>                            
+                                {Products?.salePrice ? <>
+                                    <Button variant="contained" size="large" color="success" onClick={() => addCart(Products?._id, qty, Products?.salePrice)}>Add to cart</Button>  
+                                </> : <>
+                                    <Button variant="contained" size="large" color="success" onClick={() => addCart(Products?._id, qty, Products?.price)}>Add to cart</Button>  
+                                </>}                          
                             </> : <></>}
 
 

@@ -12,6 +12,8 @@ import SingleProduct from '../views/SingleProduct.vue'
 import Login from '../views/Login.vue'
 import Signup from '../views/Signup.vue'
 import Profile from '../views/Profile.vue'
+import Orders from '../views/Orders.vue'
+import OrderPage from '../views/OrderPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +23,18 @@ const router = createRouter({
       name: 'Home',
       component: Home,
       meta: { requiredAuth: false }
+    },
+    {
+      path: '/orders',
+      name: 'Orders',
+      component: Orders,
+      meta: { requiredAuth: false }
+    },
+    {
+      path: '/order/:id',
+      name: 'OrderPage',
+      component: OrderPage,
+      meta: { requiredAuth: true }
     },
     {
       path: '/products',

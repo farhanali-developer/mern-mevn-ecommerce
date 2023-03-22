@@ -3,9 +3,11 @@ import { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../context/cartContext';
 import { userContext } from '../context/userContext';
+import { CouponContext } from '../context/couponContext'
 import { Grid, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, TextField, colors, Container, Snackbar, IconButton, Slide, Alert as MuiAlert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, MenuItem, OutlinedInput, InputAdornment  } from '@mui/material'
 // import CloseIcon from '@mui/icons-material/Close';
 import { Close as CloseIcon, Delete } from '@mui/icons-material'
+import axios from 'axios';
 
 const whiteColor = colors.common.white;
 
@@ -31,19 +33,22 @@ const deleteHover = {
 
 const Cart = () => {
     
-    const { cartData, updateCart, removeFromCart } = useContext(CartContext);
-    const { user } = useContext(userContext);
-    const [newCartData, setNewCartData] = useState([]);
+    const { cartData, updateCart, removeFromCart, setCartData, fetchCart } = useContext(CartContext)
+    const { user } = useContext(userContext)
+    const { fetchCoupon, applyCoupon, coupon } = useContext(CouponContext)
+    const [newCartData, setNewCartData] = useState([])
+    const [updateCartData, setUpdateCartData] = useState()
     const [color, setColor] = useState("")
     const [size, setSize] = useState("")
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
     const [state, setState] = useState({
         open: false,
         Transition: 'SlideTransition'
-    });
+    })
 
-    const [transition, setTransition] = useState(undefined);
+    const [transition, setTransition] = useState(undefined)
     const [alert, setAlert] = useState("")
+    const [couponCode, setCouponCode] = useState("")
 
     const handleDialogOpen = () => {
         setOpen(true);
@@ -70,10 +75,6 @@ const Cart = () => {
             "attributes" : {
                 "color" : "",
                 "size": ""
-            },
-            "cartTotal": {
-                "totalQuantity": qty,
-                "total": subTotal
             }
         }
 
@@ -142,9 +143,28 @@ const Cart = () => {
         }
     }
 
+    const applyCouponCode = async () => {
+        if(fetchCoupon(couponCode)){
+            fetchCart()
+            setAlert("Coupon Applied on Cart!");
+            openSnackBar()
+        }
+        else{
+            fetchCart()
+            setAlert("Something went wrong!");
+            openSnackBar()
+        }
+    }
+        
+    
+
     useEffect(() => {
         setNewCartData(cartData?.products)
+        if(!updateCartData?._id){
+            setUpdateCartData(cartData)
+        }
     }, [cartData])
+
 
   return (
     <Container maxWidth="xl">
@@ -218,11 +238,21 @@ const Cart = () => {
                                             </TextField>
                                         </> : <></>} */}
                                     </TableCell>
-                                    <TableCell align="center">${item?.product?.price}</TableCell>
+                                    {item?.product?.salePrice ? <>
+                                        <TableCell align="center">${item?.product?.salePrice}</TableCell>
+                                    </> : <>
+                                        <TableCell align="center">${item?.product?.price}</TableCell>
+                                    </>}
+                                    
                                     <TableCell align="center">
-                                        {!item?.canBeSubscribed ? <>
+                                        {item?.quantity > 0 ? <>
                                             <Stack spacing={0} direction="row" justifyContent="center" sx={{mb:5, ml:0}}>
-                                                <Button variant="contained" size="small" color="success" sx={{borderRadius: "0px"}} onClick={() => qtyDecrease(item?.product?._id, item?.quantity, item?.product?.price)}>-</Button>
+                                            {item?.product?.salePrice ? <>
+                                                <Button variant="contained" size="small" color="success" sx={{borderRadius: "0px"}} onClick={() => qtyDecrease(item?.product?._id, item?.quantity, item?.product?.salePrice)}>-</Button>
+                                            </> : <>
+                                            <Button variant="contained" size="small" color="success" sx={{borderRadius: "0px"}} onClick={() => qtyDecrease(item?.product?._id, item?.quantity, item?.product?.price)}>-</Button>
+                                            </> }
+                                                
                                                 <OutlinedInput
                                                     id="outlined-adornment-weight"
                                                     aria-describedby="outlined-weight-helper-text"
@@ -233,7 +263,12 @@ const Cart = () => {
                                                     sx={{p:0, width: "100px", borderRadius: "0px", "> #outlined-adornment-weight" : {textAlign: "center", WebkitTextFillColor: whiteColor}}}
                                                     value={item?.quantity}
                                                 />
-                                                <Button variant="contained" size="small" color="success" sx={{borderRadius: "0px"}} onClick={() => qtyIncrease(item?.product?._id, item?.quantity, item?.product?.price)}>+</Button>
+                                                {item?.product?.salePrice ? <>
+                                                    <Button variant="contained" size="small" color="success" sx={{borderRadius: "0px"}} onClick={() => qtyIncrease(item?.product?._id, item?.quantity, item?.product?.salePrice)}>+</Button>
+                                                </> : <>
+                                                    <Button variant="contained" size="small" color="success" sx={{borderRadius: "0px"}} onClick={() => qtyIncrease(item?.product?._id, item?.quantity, item?.product?.price)}>+</Button>
+                                                </> }
+                                                
                                             </Stack>
                                         </> : <></>}
 
@@ -321,6 +356,18 @@ const Cart = () => {
                             </TableBody>
                         </Table>
                     </TableContainer>
+                    <Stack spacing={0} direction="row" justifyContent="flex-end" sx={{mt:5}}>
+                    <TextField
+                        id="outlined-required"
+                        label="Got a Coupon?"
+                        value={couponCode}
+                        onChange={(e) => {setCouponCode(e.target.value)}}
+                    />
+                    <Button variant="contained" size="large" color="primary" sx={{ml:2}}
+                    onClick={() => applyCouponCode()}
+                    >
+                        Apply Coupon</Button>
+                    </Stack>
                 </>
                 }
             </Grid>

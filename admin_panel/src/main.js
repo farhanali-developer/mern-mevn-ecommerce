@@ -13,7 +13,6 @@ import './assets/main.css'
 import {VueCsvImportPlugin} from "vue-csv-import";
 import VueAwesomePaginate from "vue-awesome-paginate";
 import "vue-awesome-paginate/dist/style.css";
-
 /* import the fontawesome core */
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCartShopping } from '@fortawesome/free-solid-svg-icons'

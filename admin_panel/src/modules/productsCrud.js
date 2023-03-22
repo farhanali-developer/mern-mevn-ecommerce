@@ -45,6 +45,16 @@ const getProducts = () => {
       console.log(error)
     }
   }
+
+  const getAllOrders = async () => {
+    try {
+        const res = await axios.get("/all-orders")
+        return res.data;
+    }
+    catch(error) {
+      console.log(error)
+    }
+  }
   
    const newProduct = async (data) => { 
       // const data = {
@@ -58,7 +68,7 @@ const getProducts = () => {
       const rawObject = JSON.parse(JSON.stringify(data.value));
       // console.log(rawObject)
 
-    const res = await axios.post("/add_product", rawObject, {headers: { "Content-Type": "application/json" },})
+    const res = await axios.post("/add-product", rawObject, {headers: { "Content-Type": "application/json" },})
     return "added"
       // return res
    }
@@ -132,7 +142,7 @@ const getProducts = () => {
      }
 
      const newData = data
-     await axios.post("/csv_products", newData, headers)
+     await axios.post("/add-products-from-csv-file", newData, headers)
      return "imported"
    }
   
@@ -198,7 +208,8 @@ const getProducts = () => {
     login,
     logout,
     userData,
-    user
+    user,
+    getAllOrders
   }
 }
 

@@ -17,6 +17,7 @@
     "apexcharts": "^3.36.3",
     "axios": "^1.2.3",
     "bootstrap": "^5.2.3",
+    "datatables.net-vue3": "^2.1.0",
     "firebase": "^9.16.0",
     "pinia": "^2.0.28",
     "vue": "^3.2.45",

@@ -17,32 +17,29 @@ const getCart = async (req, res) => {
 }
 
 const postCart = async (req, res) => {
-    // const { attributes } = req.body;
 
     const userId = req?.body?.userId
     const product = req?.body?.product
     const quantity = req?.body?.quantity
     const price = req?.body?.price
+    const salePrice = req?.body?.salePrice
     const subTotal = req?.body?.subTotal
     const attributes = req?.body?.attributes
     const canBeSubscribed = req?.body?.canBeSubscribed
+
     
     const checkUser = await Users.findById(userId)
     if(!checkUser){
       res.status(404).json({message: "User not found."})
     }
+    
+    let cart = await Cart.findOne({ userId });
 
-    try {
-      
-      let cart = await Cart.findOne({ userId });
-  
+    try {   
       if (cart) {
         //cart exists for user
-        let itemIndex = cart.products.findIndex(p => p.product == product);
-
+        let itemIndex = cart.products.findIndex(item => item.product == product);
         let totalProducts = cart.products;
-        let totalQuantity = '';
-        let totalAmount = '';
   
         if (itemIndex > -1) {
           //product exists in the cart, update the quantity
@@ -60,23 +57,27 @@ const postCart = async (req, res) => {
 
           cart.products[itemIndex] = productItem;
 
-          totalProducts.map((products) => {
-            totalQuantity = +totalQuantity + +products?.quantity;
-            totalAmount = +totalAmount + +products?.subTotal;
-          });
+          const totalQuantity = totalProducts.reduce((acc, current) => {
+            return acc + parseInt(current?.quantity)
+          }, 0)
+          const totalAmount = totalProducts.reduce((acc, current) => {
+            return acc + parseInt(current?.subTotal)
+          }, 0)
 
           cart.cartTotal['totalQuantity'] = totalQuantity;
           cart.cartTotal['total'] = totalAmount;
-
+          
         } else {
           //product does not exists in cart, add new item
           cart.products.push({ product, quantity, price, subTotal, attributes, canBeSubscribed });
 
-          totalProducts.map((products) => {
-            totalQuantity = +totalQuantity + +products?.quantity;
-            totalAmount = +totalAmount + +products?.subTotal;
-          });
-
+          const totalQuantity = totalProducts.reduce((acc, current) => {
+            return acc + parseInt(current?.quantity)
+          }, 0)
+          const totalAmount = totalProducts.reduce((acc, current) => {
+            return acc + parseInt(current?.subTotal)
+          }, 0)
+          
           cart.cartTotal['totalQuantity'] = totalQuantity;
           cart.cartTotal['total'] = totalAmount;
         }
@@ -88,7 +89,7 @@ const postCart = async (req, res) => {
         const newCart = await Cart.create({
           userId,
           products: [{ product, quantity, price, subTotal, attributes, canBeSubscribed }],
-          cartTotal: { totalQuantity: quantity, total: subTotal }
+          cartTotal: { totalQuantity: quantity, total: subTotal, couponPrice: 0 }
         });
   
         return res.status(201).send(newCart);
@@ -97,6 +98,65 @@ const postCart = async (req, res) => {
       console.log(err);
       res.status(500).send("Something went wrong");
     }
+
+}
+
+const postVirtualCart = async (req, res) => {
+
+  const userId = req?.body?.userId
+  const product = req?.body?.product
+  const quantity = req?.body?.quantity || 0
+  const price = req?.body?.price
+  const salePrice = req?.body?.salePrice
+  const subTotal = req?.body?.subTotal
+  const attributes = req?.body?.attributes
+  const canBeSubscribed = req?.body?.canBeSubscribed
+  const couponPrice = req?.body?.cartTotal?.couponPrice
+
+  
+  const checkUser = await Users.findById(userId)
+  if(!checkUser){
+    res.status(404).json({message: "User not found."})
+  }
+  
+  let cart = await Cart.findOne({ userId });
+  try {
+        
+    if (cart) {
+      //cart exists for user
+      let totalProducts = cart.products;
+
+      //product does not exists in cart, add new item
+      cart.products.push({ product, quantity, price, subTotal, attributes, canBeSubscribed });
+
+      const totalQuantity = totalProducts.reduce((acc, current) => {
+        return acc + parseInt(current?.quantity)
+      }, 0)
+      const totalAmount = totalProducts.reduce((acc, current) => {
+        return acc + parseInt(current?.subTotal)
+      }, 0)
+      
+      cart.cartTotal['totalQuantity'] = totalQuantity;
+      cart.cartTotal['total'] = totalAmount;
+
+      cart = await cart.save();
+      return res.status(201).send(cart);
+      
+    }
+    else {
+      //no cart for user, create new cart
+      const newCart = await Cart.create({
+        userId,
+        products: [{ product, quantity, price, subTotal, attributes, canBeSubscribed }],
+        cartTotal: { totalQuantity: quantity, total: subTotal, couponPrice: couponPrice }
+      });
+
+      return res.status(201).send(newCart);
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Something went wrong");
+  }
 }
 
 const deleteCart = async (req, res) => {
@@ -138,4 +198,4 @@ const deleteAll = async (req, res) => {
     res.json(deleteAllProducts)
 }
 
-module.exports = { getCart, postCart, deleteCart, deleteAll }
+module.exports = { getCart, postCart, postVirtualCart, deleteCart, deleteAll }

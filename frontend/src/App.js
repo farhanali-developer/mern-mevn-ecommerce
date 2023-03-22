@@ -51,7 +51,7 @@ function App() {
   }
 
   const getKey = async () => {
-    const res = await axios.get('/stripe_key')
+    const res = await axios.get('/stripe-key')
     setStripePromise(loadStripe(res.data.stripeKey))
   }
 
@@ -61,9 +61,10 @@ function App() {
   }
 
   useEffect(()=>{
+    console.log('i fire once');
     fetchData();
     getKey()
-      getSecretKey()
+    getSecretKey()
   }, []);
 
   return (

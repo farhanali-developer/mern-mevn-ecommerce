@@ -3,6 +3,7 @@ const OrdersSchema = new mongoose.Schema(
     {
         deliveryMethod: String,
         paymentMethod: String,
+        orderStatus: String,
         customerInfo : {
             userId: {
                 type: mongoose.Schema.Types.ObjectId,
@@ -31,6 +32,7 @@ const OrdersSchema = new mongoose.Schema(
             }
         ],
         cartTotal: {
+            discount: Number,
             totalQuantity: Number,
             total: Number
         },

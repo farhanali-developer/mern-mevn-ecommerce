@@ -33,9 +33,21 @@ const CartProvider = ({ children }) => {
     }
   }
 
+  const addVirtualProductToCart = async (item) => {
+    try {
+      const res = await axios.post('/virtual-cart', item); // Api call to add to cart
+      if(res.data) {
+        await fetchCart();
+      }
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const updateCart = async (item) => {
     try {
-      const res = await axios.put('/cart', item); // Api call to add to cart
+      const res = await axios.put('/cart', item); // Api call to update cart
       if(res.data) {
         await fetchCart()
       }
@@ -46,7 +58,7 @@ const CartProvider = ({ children }) => {
 
   const removeFromCart = async (id) => {
     try {
-      const res = await axios.delete(`/delete_cart_item/${user?._id}/${id}`); // Api call to remove to cart
+      const res = await axios.delete(`/delete-cart-item/${user?._id}/${id}`); // Api call to remove to cart
       if(res.data) {
         await fetchCart()
       }
@@ -63,7 +75,7 @@ const CartProvider = ({ children }) => {
 
 
   return (
-    <CartContext.Provider value={{ addToCart, updateCart, removeFromCart, cartData, fetchCart }}>
+    <CartContext.Provider value={{ addToCart, addVirtualProductToCart, updateCart, removeFromCart, cartData, fetchCart, setCartData }}>
       {children}
     </CartContext.Provider>
   );

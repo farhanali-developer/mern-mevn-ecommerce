@@ -71,8 +71,12 @@ export default function AllProducts() {
                           <img style={{ height: "300px", width: "100%", objectFit: "cover", borderTopLeftRadius: "20px", borderTopRightRadius: "20px" }} src={`${data?.thumbnail}`} alt="Product" />
                           <h2 style={{ textAlign: "center", fontSize: "16px", color: "#fff", marginTop: "20px" }}>{title}</h2>
                           <div style={{ fontWight: "bold", marginTop: "20px", textAlign: "center" }}>
-                              <s style={{ fontSize: "1.1rem", color: "#6c757d" }}>{data?.salePrice}</s>
-                              <span style={{ fontSize: "1.1rem", color: "#dc3545", marginLeft: "10px" }}>{data?.price}</span>
+                            {data?.salePrice ? <>
+                              <s style={{ fontSize: "1.1rem", color: "#6c757d" }}>${data?.price}</s>
+                              <span style={{ fontSize: "1.1rem", color: "#dc3545", marginLeft: "10px" }}>${data?.salePrice}</span>
+                            </> : <>
+                              <span style={{ fontSize: "1.1rem", color: "#dc3545", marginLeft: "10px" }}>${data?.price}</span>
+                            </>}
                           </div>
                         </Box>
                       </Link>

@@ -12,20 +12,21 @@ import './interceptors/axios'
 import { UserProvider } from './context/userContext';
 import { CartProvider } from './context/cartContext';
 import { WishlistProvider } from './context/wishlistContext';
+import { CouponProvider } from './context/couponContext'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
+  <BrowserRouter>
       <UserProvider>
         <CartProvider>
-          <WishlistProvider>
-            <App />
-          </WishlistProvider>
+          <CouponProvider>
+            <WishlistProvider>
+              <App />
+            </WishlistProvider>
+          </CouponProvider>
         </CartProvider>
       </UserProvider>
     </BrowserRouter>
-  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

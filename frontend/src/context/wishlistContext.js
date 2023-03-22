@@ -35,7 +35,7 @@ const WishlistProvider = ({ children }) => {
 
   const removeFromWishlist = async (id) => {
     try {
-      const res = await axios.delete(`/delete_wishlist_item/${user?._id}/${id}`); // Api call to remove from wishlist
+      const res = await axios.delete(`/delete-wishlist-item/${user?._id}/${id}`); // Api call to remove from wishlist
       await fetchWishlist()
       
     } catch (error) {

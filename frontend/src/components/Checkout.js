@@ -336,7 +336,7 @@ export default function Checkout() {
           setSeverity("success");
           openSnackBar()
           setTimeout(()=> {
-            navigate(`/order/${orderId}`);
+            // navigate(`/order/${orderId}`);
            }, 3000);
         }
         else{
@@ -350,7 +350,7 @@ export default function Checkout() {
   };
 
   const getKey = async () => {
-    const res = await axios.get('/stripe_key')
+    const res = await axios.get('/stripe-key')
     setStripePromise(loadStripe(res.data.stripeKey))
   }
 
@@ -436,7 +436,7 @@ export default function Checkout() {
             setSeverity("success");
             openSnackBar()
             setTimeout(()=> {
-              navigate(`/order/${orderId}`);
+              // navigate(`/order/${orderId}`);
              }, 3000);
           }
           else{

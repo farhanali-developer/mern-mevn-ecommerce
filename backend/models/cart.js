@@ -15,13 +15,11 @@ const CartSchema = new mongoose.Schema(
           price: Number,
           subTotal: Number,
           canBeSubscribed: Boolean,
-          attributes: {
-            color: String,
-            size: String
-          },
+          attributes: Object,
         }
       ],
       cartTotal: {
+        couponPrice: Number,
         totalQuantity: Number,
         total: Number
       },

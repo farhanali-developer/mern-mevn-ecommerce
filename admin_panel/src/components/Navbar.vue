@@ -27,6 +27,9 @@
                                 <li class="nav-item" v-if="getUserProfile.id">
                                     <RouterLink to="/profile" class="nav-link">Profile</RouterLink>
                                 </li>
+                                <li class="nav-item" v-if="getUserProfile.id">
+                                    <RouterLink to="/orders" class="nav-link">Orders</RouterLink>
+                                </li>
                             </ul>
                             <!-- <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
