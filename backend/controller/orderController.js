@@ -3,14 +3,21 @@ const jwt = require('jsonwebtoken')
 const Orders = require('../models/order')
 const Cart = require('../models/cart')
 const Users = require('../models/users')
+const Notifications = require('../models/notifications')
 require("dotenv").config({ path: "../.env" });
 const secret = process.env.SECRET
 const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY
+const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN
+const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID
+const PUSHER_APP_ID = process.env.PUSHER_APP_ID
+const PUSHER_KEY = process.env.PUSHER_KEY
+const PUSHER_SECRET = process.env.PUSHER_SECRET
 const stripe = require('stripe')(STRIPE_SECRET_KEY)
 const nodemailer = require("nodemailer");
 const AllProducts = require('../models/allproducts')
 const axios = require('axios');
+const Pusher = require("pusher")
 
 
 const getOrders = async (req, res) => {
@@ -38,12 +45,59 @@ const stripeKey = async (req, res) => {
 }
 
 const getOrderById = async (req, res) => {
-    const data = await Orders.findById({ _id : req.params.id })
+    const data = await Orders.findById({ _id : req.params.id }).populate("products.product")
     res.json(data)
 }
 
-const postOrderData = async (req, res) => {
+const updateOrderStatus = async (req, res) => {
+  try {
+    const newStatus = await Orders.findByIdAndUpdate(
+      req.body.id,
+      {
+        orderStatus: req.body.newStatus
+      },
+      {
+        new: true
+      }
+    )
 
+    const notificationsData = {
+      userId: req.body.userId,
+      notifications: [{
+        orderId: req.body.id,
+        oldStatus: req.body.oldStatus,
+        newStatus: req.body.newStatus,
+        readStatus: false
+      }]
+    }
+
+    const notifications = await Notifications.create(notificationsData)
+
+    console.log(notifications)
+
+
+    const pusher = new Pusher({
+      appId: PUSHER_APP_ID,
+      key: PUSHER_KEY,
+      secret: PUSHER_SECRET,
+      useTLS: true,
+      cluster: "ap2",
+    })
+
+    pusher.trigger("my-channel", "my-event", {
+      message: "Your Order # "+req.body.id+" status updated. Changed from "+req.body.oldStatus+" to "+req.body.newStatus+""
+    });
+
+
+  } catch (error) {
+      console.error(error);
+      const e = new Error('Error while updating.');
+      throw e;
+  }
+    
+}
+
+const postOrderData = async (req, res) => {
     const newOrder = await (await Orders.create(req.body?.data)).populate('products.product')
     const userId = req.body?.data?.customerInfo.userId
     // const deleteCart = await Cart.findOneAndRemove({userId: userId})
@@ -100,18 +154,29 @@ const postOrderData = async (req, res) => {
       "template": {
         "name": "mern",
         "language": {
-          "code": "en_US"
-        }
+          "code": "en"
+        },
+        "components": [
+          {
+            "type": "body",
+            "parameters": [
+              {
+                "type": "text",
+                "text": newOrderId
+              }
+            ]
+          }
+        ]
       }
     });
     
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: 'https://graph.facebook.com/v15.0/104907332408432/messages',
+      url: 'https://graph.facebook.com/v15.0/'+WHATSAPP_PHONE_NUMBER_ID+'/messages',
       headers: { 
         'Content-Type': 'application/json', 
-        'Authorization': 'Bearer EAADVTafgTFkBAOApg6ZBDDdOJZAWxDWZCPw4yZB0FR0ZC4en6R9Av2TZAk2qAriBQZB8Vlt37xBLQmyaPbQfyiqwGxfV550ERVGDHR2TGIDaXVFzJXGZCZAZACCNtjqItZCIioj09uyN7XrleBjvu080UesjIG2nZAtuXAZAqfkfTdYXgGrlYwKaHNPZB9nDqCg581HGG9ZAMWaYtrjgewR4z7uWucJJmZBREiIMylEZD'
+        'Authorization': 'Bearer '+WHATSAPP_ACCESS_TOKEN+''
       },
       data : data
     };
@@ -903,4 +968,4 @@ const paymentIntent = async (req, res) => {
       }
 }
 
-module.exports = { getOrders, getOrderById, postOrderData, stripeKey, paymentIntent, getAllOrders }
+module.exports = { getOrders, getOrderById, postOrderData, stripeKey, paymentIntent, getAllOrders, updateOrderStatus }

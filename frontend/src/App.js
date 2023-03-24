@@ -61,7 +61,6 @@ function App() {
   }
 
   useEffect(()=>{
-    console.log('i fire once');
     fetchData();
     getKey()
     getSecretKey()

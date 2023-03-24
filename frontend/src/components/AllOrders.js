@@ -46,6 +46,8 @@ const AllOrders = () => {
 
             let paymentMethod = ""
             let deliveryMethod = ""
+            let orderStatus = ""
+            let orderColor = ""
 
             if(order?.paymentMethod == "cod"){
               paymentMethod = "Cash on Delivery"
@@ -62,6 +64,23 @@ const AllOrders = () => {
             }
             else if(order?.deliveryMethod == "worldwide"){
               deliveryMethod = "World Wide"
+            }
+
+            if(order?.orderStatus == "processing"){
+              orderStatus = "Processing"
+              orderColor = "secondary"
+            }
+            else if(order?.orderStatus == "dispatched"){
+              orderStatus = "Dispatched"
+              orderColor = "warning"
+            }
+            else if(order?.orderStatus == "finished"){
+              orderStatus = "Finished"
+              orderColor = "success"
+            }
+            else if(order?.orderStatus == "declined"){
+              orderStatus = "Declined"
+              orderColor = "error"
             }
 
             return (
@@ -102,7 +121,7 @@ const AllOrders = () => {
                         <TableCell align="right">{paymentMethod}</TableCell>
                         <TableCell align="right">{order?.cartTotal?.totalQuantity}</TableCell>
                         <TableCell align="right">${order?.cartTotal?.total}</TableCell>
-                        <TableCell align="right"><Chip label="Finished" color="success" sx={{color: whiteColor}} /></TableCell>
+                        <TableCell align="right"><Chip label={orderStatus} color="success" sx={{color: whiteColor}} /></TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>

@@ -55,6 +55,39 @@ const getProducts = () => {
       console.log(error)
     }
   }
+
+  const GetSpecificOrder = async (id) => {
+    try {
+      const res = await axios.get(`/order/${id}`)
+      const data = await res.data
+      return data
+    }
+    catch(error) {
+      console.log(error)
+    }
+  }
+
+  const getOrderStatus = async (id) => {
+    try {
+      const res = await axios.get(`/order/${id}`)
+      const data = await res.data
+      return data
+    }
+    catch(error) {
+      console.log(error)
+    }
+  }
+
+  const updateOrderStatus = async (item) => {
+    try {
+      const res = await axios.post(`/update-order`, item)
+      const data = await res.data
+      return data
+    }
+    catch(error) {
+      console.log(error)
+    }
+  }
   
    const newProduct = async (data) => { 
       // const data = {
@@ -209,7 +242,10 @@ const getProducts = () => {
     logout,
     userData,
     user,
-    getAllOrders
+    getAllOrders,
+    GetSpecificOrder,
+    updateOrderStatus,
+    getOrderStatus
   }
 }
 

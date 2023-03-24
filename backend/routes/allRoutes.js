@@ -5,9 +5,10 @@ const { paginate } = require('../middleware/pagination')
 const { userLogin, userData, userLogout, userSignup, profileUpdate } = require('../controller/userController');
 const { getAllProducts, addProduct, csvImport, getProductById, deleteById, deleteAllProducts, updateById } = require('../controller/productController');
 const { getCart, postCart, postVirtualCart, deleteCart, deleteAll } = require('../controller/cartController');
-const { getOrders, getOrderById, postOrderData, stripeKey, paymentIntent, getAllOrders } = require('../controller/orderController')
+const { getOrders, getOrderById, postOrderData, stripeKey, paymentIntent, getAllOrders, updateOrderStatus } = require('../controller/orderController')
 const { getWishlist, addToWishlist, deleteWishlist } = require('../controller/wishlistController')
 const { getCoupon, applyCoupon } = require('../controller/couponController')
+const { getNotifications } = require('../controller/notificationsController')
 
 // User routes
 router.route('/user').get(userData).patch(profileUpdate)
@@ -40,9 +41,13 @@ router.route('/stripe-key').get(stripeKey)
 router.route('/order').get(getOrders).post(postOrderData)
 router.route('/order/:id').get(getOrderById)
 router.route('/all-orders').get(getAllOrders)
+router.route('/update-order').post(updateOrderStatus)
 
 //Coupon Routes
 router.route('/get-coupon-price').post(getCoupon)
 router.route('/apply-coupon').post(applyCoupon)
+
+//Notifications Routes
+router.route('/notifications').get(getNotifications)
 
 module.exports = router

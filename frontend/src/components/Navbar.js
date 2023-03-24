@@ -5,9 +5,11 @@ import { useContext, useState } from 'react';
 import { CartContext } from '../context/cartContext';
 import { userContext } from '../context/userContext';
 import { WishlistContext } from '../context/wishlistContext';
-import { styled, alpha, AppBar, Box, Toolbar, IconButton, Typography, InputBase, Badge, Menu, MenuItem, Alert as MuiAlert, Slide, Snackbar, Autocomplete, CircularProgress, TextField } from '@mui/material';
+import { styled, alpha, AppBar, Box, Toolbar, IconButton, Typography, InputBase, Badge, Menu, MenuItem, Alert as MuiAlert, Slide, Snackbar, Autocomplete, CircularProgress, TextField, Paper, MenuList } from '@mui/material';
 import { Menu as MenuIcon,  Search as SearchIcon, AccountCircle, Notifications as NotificationsIcon, More, ShoppingCart, Mail, Favorite, CloseOutlined as CloseIcon } from '@mui/icons-material';
 // import { Favorite, CloseOutlined as CloseIcon } from '@mui/icons-material';
+import Pusher from 'pusher-js';
+
 
   function sleep(delay = 0) {
     return new Promise((resolve) => {
@@ -115,9 +117,26 @@ function TransitionDown(props) {
 }
 
 export default function Navbar() {
+
+
+  // Enable pusher logging - don't include this in production
+  // Pusher.logToConsole = true;
+
+  var pusher = new Pusher('3863e7b2b7108bbe9f82', {
+    cluster: 'ap2'
+  });
+
+  var channel = pusher.subscribe('my-channel');
+  channel.bind('my-event', function(data) {
+    console.log(data)
+  });
+
+
   const [anchorEl, setAnchorEl] = useState('');
+  const [anchorEl2, setAnchorEl2] = useState('');
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState('');
   const isMenuOpen = Boolean(anchorEl);
+  const isNotificationsMenuOpen = Boolean(anchorEl2);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   const { wishlistData } = useContext(WishlistContext);
@@ -133,6 +152,7 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
+  const [notifications, setNotifications] = useState([])
   // const [ products, setProducts ] = useState([])
   const loading = open && options.length === 0;
 
@@ -162,6 +182,16 @@ export default function Navbar() {
     }
   }, [open]);
 
+  const getNotifications = async () => {
+    const res = await axios.get('/notifications')
+    setNotifications(res.data)
+    console.log(res.data)
+  }
+
+  useEffect(() => {
+    getNotifications()
+  }, [])
+
   // const fetchProducts = async () => {
   //   const res = await axios.get('/')
   //   setProducts(res.data.results)
@@ -177,12 +207,21 @@ export default function Navbar() {
     setAnchorEl(event.currentTarget);
   };
 
+  const handleNotificationsMenuOpen = (event) => {
+    setAnchorEl2(event.currentTarget);
+  };
+
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+    handleMobileMenuClose();
+  };
+
+  const handleNotificationsMenuClose = () => {
+    setAnchorEl2(null);
     handleMobileMenuClose();
   };
 
@@ -259,6 +298,33 @@ export default function Navbar() {
       {menuItems()}
       
       
+    </Menu>
+  );
+
+  const notificationsMenuId = 'notifications-menu';
+  const renderNotificationsMenu = (
+    <Menu
+      anchorEl={anchorEl2}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={notificationsMenuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isNotificationsMenuOpen}
+      onClose={handleNotificationsMenuClose}
+    >
+      <MenuList>
+        <MenuItem>
+          <Typography variant="inherit" noWrap>
+            A very long text that overflows
+          </Typography>
+        </MenuItem>
+      </MenuList> 
     </Menu>
   );
 
@@ -384,7 +450,8 @@ export default function Navbar() {
                     </IconButton>
                   
                   </Link>
-                  <Link to="/wishlist" style={{ textDecoration: "none", color: "unset" }}>
+                  {isLoggedIn() && !isGuest() ? <>
+                    <Link to="/wishlist" style={{ textDecoration: "none", color: "unset" }}>
                     <IconButton size="large" aria-label="show 4 new mails" color="inherit">
                       <Badge badgeContent={wishlistCount} color="error">
                           <Favorite />
@@ -396,6 +463,9 @@ export default function Navbar() {
                     size="large"
                     aria-label="show 17 new notifications"
                     color="inherit"
+                    aria-haspopup="true"
+                    aria-controls={notificationsMenuId}
+                    onClick={handleNotificationsMenuOpen}
                     >
                   <Badge badgeContent={17} color="error">
                       <NotificationsIcon />
@@ -412,6 +482,8 @@ export default function Navbar() {
                   >
                   <AccountCircle />
                   </IconButton>
+                  </> : <></>}
+                  
               </Box>
               <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
                   <IconButton
@@ -453,6 +525,7 @@ export default function Navbar() {
         </Snackbar>
       {renderMobileMenu}
       {renderMenu}
+      {renderNotificationsMenu}
     </Box>
   );
 }

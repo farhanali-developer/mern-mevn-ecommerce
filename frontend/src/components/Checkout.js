@@ -201,7 +201,8 @@ export default function Checkout() {
       cartTotal: {},
       deliveryMethod: '',
       paymentMethod: '',
-      paymentId: ''
+      paymentId: '',
+      orderStatus: ''
     },
   );
   const [state, setState] = useState({
@@ -305,6 +306,7 @@ export default function Checkout() {
       },
       products: cartData?.products,
       cartTotal: cartData?.cartTotal,
+      orderStatus: 'processing'
     })
 
     handleNext()
@@ -328,6 +330,7 @@ export default function Checkout() {
   const finalOrder = async () => {
     try {
         handleDialogClose()
+        console.log(orderData)
         const res = await axios.post('/order', {data: orderData});
         const orderId = res.data.orderId
         fetchCart()
