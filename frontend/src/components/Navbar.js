@@ -128,11 +128,13 @@ export default function Navbar() {
 
   var channel = pusher.subscribe('my-channel');
   channel.bind('my-event', function(data) {
-    console.log(data)
-    setPusherNotifications({
-      ...pusherNotifications,
-      data
-    })
+    console.log(data);
+    setPusherNotifications(prevState => ({
+      ...prevState,
+      ...data
+    }));
+
+    setNotificationsCount(notificationsCount+1)
   });
 
 
@@ -158,7 +160,8 @@ export default function Navbar() {
   const [options, setOptions] = useState([]);
   const [notifications, setNotifications] = useState([])
   const [newNotifications, setNewNotifications] = useState([])
-  const [pusherNotifications, setPusherNotifications] = useState()
+  const [pusherNotifications, setPusherNotifications] = useState({})
+  const [notificationsCount, setNotificationsCount] = useState(0)
   // const [ products, setProducts ] = useState([])
   const loading = open && options.length === 0;
 
@@ -188,16 +191,17 @@ export default function Navbar() {
     }
   }, [open]);
 
-  let notificationsCount = 0;
 
   const getNotifications = async () => {
-    const res = await axios.get('/notifications')
-    setNotifications(res.data)
-    res.data.map((item) => {
-      notificationsCount = item.notifications.filter(notification => notification.readStatus === false).length;
-      console.log(notificationsCount);
-      setNewNotifications(item.notifications)
-    })
+    const res = await axios.get('/notifications');
+    setNotifications(res.data);
+    let count = 0;
+    res.data.forEach(item => {
+      const newNotifications = item.notifications.filter(notification => notification.readStatus === false);
+      count += newNotifications.length;
+      setNewNotifications(newNotifications);
+    });
+    setNotificationsCount(count);
   }
 
   useEffect(() => {
@@ -213,16 +217,6 @@ export default function Navbar() {
   useEffect(() => {
     notificationsCounter()
   }, [notifications])
-
-  useEffect(() => {
-    const pusherNewnotifications = () => {
-      return [
-        <Typography variant="inherit" noWrap>
-          Your Order # {pusherNotifications?.orderId} status updated. Changed from {capitalize(pusherNotifications?.oldStatus)} to {capitalize(pusherNotifications.newStatus)}.
-        </Typography>
-      ]
-    }
-  }, [pusherNotifications])
 
 
   
@@ -359,13 +353,13 @@ export default function Navbar() {
     >
       <MenuList>
         
-            {pusherNotifications ? <>
-              <MenuItem>
-              <Typography variant="inherit" noWrap>
-              Your Order # {pusherNotifications?.orderId} status updated. Changed from {capitalize(pusherNotifications?.oldStatus)} to {capitalize(pusherNotifications.newStatus)}.
-            </Typography>
-            </MenuItem>
-            </> : <></>}
+      {pusherNotifications.orderId && (
+        <MenuItem>
+          <Typography variant="inherit" noWrap>
+            Your Order #{pusherNotifications.orderId} status updated. Changed from {capitalize(pusherNotifications.oldStatus)} to {capitalize(pusherNotifications.newStatus)}.
+          </Typography>
+        </MenuItem>
+      )}
             
 
         {newNotifications.map((item) => {
