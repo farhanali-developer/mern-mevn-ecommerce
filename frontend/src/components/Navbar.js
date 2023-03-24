@@ -185,12 +185,21 @@ export default function Navbar() {
   const getNotifications = async () => {
     const res = await axios.get('/notifications')
     setNotifications(res.data)
-    console.log(res.data)
+    // console.log(res.data)
   }
 
   useEffect(() => {
     getNotifications()
   }, [])
+
+  let notificationsCount;
+
+  useEffect(() => {
+    notifications.map((item) => {
+      console.log(item)
+      notificationsCount = item.notifications.filter(notification => notification.readStatus === false).length;
+    })
+  }, [notifications])
 
   // const fetchProducts = async () => {
   //   const res = await axios.get('/')
@@ -467,10 +476,12 @@ export default function Navbar() {
                     aria-controls={notificationsMenuId}
                     onClick={handleNotificationsMenuOpen}
                     >
-                  <Badge badgeContent={17} color="error">
+                  <Badge badgeContent={notificationsCount} color="error">
                       <NotificationsIcon />
                   </Badge>
                   </IconButton>
+                  
+                  </> : <></>}
                   <IconButton
                   size="large"
                   edge="end"
@@ -482,8 +493,6 @@ export default function Navbar() {
                   >
                   <AccountCircle />
                   </IconButton>
-                  </> : <></>}
-                  
               </Box>
               <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
                   <IconButton
