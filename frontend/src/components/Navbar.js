@@ -129,6 +129,10 @@ export default function Navbar() {
   var channel = pusher.subscribe('my-channel');
   channel.bind('my-event', function(data) {
     console.log(data)
+    setPusherNotifications({
+      ...pusherNotifications,
+      data
+    })
   });
 
 
@@ -153,6 +157,8 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
   const [notifications, setNotifications] = useState([])
+  const [newNotifications, setNewNotifications] = useState([])
+  const [pusherNotifications, setPusherNotifications] = useState()
   // const [ products, setProducts ] = useState([])
   const loading = open && options.length === 0;
 
@@ -182,24 +188,44 @@ export default function Navbar() {
     }
   }, [open]);
 
+  let notificationsCount = 0;
+
   const getNotifications = async () => {
     const res = await axios.get('/notifications')
     setNotifications(res.data)
-    // console.log(res.data)
+    res.data.map((item) => {
+      notificationsCount = item.notifications.filter(notification => notification.readStatus === false).length;
+      console.log(notificationsCount);
+      setNewNotifications(item.notifications)
+    })
   }
 
   useEffect(() => {
     getNotifications()
   }, [])
 
-  let notificationsCount;
+  
+
+  const notificationsCounter = async () => {
+    
+  }
 
   useEffect(() => {
-    notifications.map((item) => {
-      console.log(item)
-      notificationsCount = item.notifications.filter(notification => notification.readStatus === false).length;
-    })
+    notificationsCounter()
   }, [notifications])
+
+  useEffect(() => {
+    const pusherNewnotifications = () => {
+      return [
+        <Typography variant="inherit" noWrap>
+          Your Order # {pusherNotifications?.orderId} status updated. Changed from {capitalize(pusherNotifications?.oldStatus)} to {capitalize(pusherNotifications.newStatus)}.
+        </Typography>
+      ]
+    }
+  }, [pusherNotifications])
+
+
+  
 
   // const fetchProducts = async () => {
   //   const res = await axios.get('/')
@@ -310,6 +336,10 @@ export default function Navbar() {
     </Menu>
   );
 
+  function capitalize(s){
+    return s && s[0].toUpperCase() + s.slice(1);
+  }
+
   const notificationsMenuId = 'notifications-menu';
   const renderNotificationsMenu = (
     <Menu
@@ -328,11 +358,27 @@ export default function Navbar() {
       onClose={handleNotificationsMenuClose}
     >
       <MenuList>
-        <MenuItem>
-          <Typography variant="inherit" noWrap>
-            A very long text that overflows
-          </Typography>
-        </MenuItem>
+        
+            {pusherNotifications ? <>
+              <MenuItem>
+              <Typography variant="inherit" noWrap>
+              Your Order # {pusherNotifications?.orderId} status updated. Changed from {capitalize(pusherNotifications?.oldStatus)} to {capitalize(pusherNotifications.newStatus)}.
+            </Typography>
+            </MenuItem>
+            </> : <></>}
+            
+
+        {newNotifications.map((item) => {
+          return (
+            <MenuItem>
+            <Typography variant="inherit" noWrap>
+              Your Order # {item?.orderId} status updated. Changed from {capitalize(item?.oldStatus)} to {capitalize(item.newStatus)}.
+            </Typography>
+            </MenuItem>
+          )
+        })}
+          
+       
       </MenuList> 
     </Menu>
   );

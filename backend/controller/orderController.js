@@ -71,10 +71,25 @@ const updateOrderStatus = async (req, res) => {
       }]
     }
 
-    const notifications = await Notifications.create(notificationsData)
+    const userId = req.body.userId
 
-    console.log(notifications)
 
+    const notifications = await Notifications.findOne({ userId });
+    if(notifications){
+      await Notifications.findOneAndUpdate(
+        { userId: userId },
+        { $push: { notifications: { 
+          orderId: req.body.id,
+          oldStatus: req.body.oldStatus,
+          newStatus: req.body.newStatus,
+          readStatus: false
+         } }, $set: { modifiedOn: Date.now() } },
+        { new: true }
+      )
+    }
+    else{
+      await Notifications.create(notificationsData)
+    }
 
     const pusher = new Pusher({
       appId: PUSHER_APP_ID,
@@ -85,7 +100,11 @@ const updateOrderStatus = async (req, res) => {
     })
 
     pusher.trigger("my-channel", "my-event", {
-      message: "Your Order # "+req.body.id+" status updated. Changed from "+req.body.oldStatus+" to "+req.body.newStatus+""
+      // message: "Your Order # "+req.body.id+" status updated. Changed from "+req.body.oldStatus+" to "+req.body.newStatus+""
+      orderId: req.body.id,
+      oldStatus: req.body.oldStatus,
+      newStatus: req.body.newStatus,
+      readStatus: false
     });
 
 
